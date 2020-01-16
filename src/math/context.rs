@@ -11,14 +11,14 @@ pub enum AngleMeasure {
 }
 
 impl AngleMeasure {
-    pub fn to_rad(&self, value: f64) -> f64 {
+    pub fn to_rad(self, value: f64) -> f64 {
         match self {
             AngleMeasure::Degrees => value.to_radians(),
             AngleMeasure::Radians => value,
         }
     }
 
-    pub fn from_rad(&self, value: f64) -> f64 {
+    pub fn from_rad(self, value: f64) -> f64 {
         match self {
             AngleMeasure::Degrees => value.to_degrees(),
             AngleMeasure::Radians => value,
