@@ -7,11 +7,12 @@ mod math;
 mod parser;
 
 fn main() {
+    let context = Context::default();
     for s in env::args().skip(1) {
         println!("{}", s);
         let tokens = lexer::lex(&s);
         let expr = parser::parse(tokens);
-        let context = Context::default();
-        println!("  = {}", expr.eval(&context).unwrap());
+        let val = expr.eval(&context).unwrap();
+        println!("  = {}", context.display(val));
     }
 }
