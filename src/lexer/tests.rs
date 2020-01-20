@@ -36,7 +36,7 @@ fn lex_idents() {
 fn lex_operators() {
     assert_eq!(
         lex_v("+ - * / ^ ( )"),
-        vec![Add, Subtract, Multiply, Divide, Exponent, LeftParen, RightParen],
+        vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen],
     );
 }
 
@@ -44,11 +44,11 @@ fn lex_operators() {
 fn lex_operators_no_space() {
     assert_eq!(
         lex_v("+-*/^()"),
-        vec![Add, Subtract, Multiply, Divide, Exponent, LeftParen, RightParen],
+        vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen],
     );
 }
 
 #[test]
 fn lex_excess_spaces() {
-    assert_eq!(lex_v("   3 +5  "), vec![Number(3.0), Add, Number(5.0)])
+    assert_eq!(lex_v("   3 +5  "), vec![Number(3.0), Plus, Number(5.0)])
 }

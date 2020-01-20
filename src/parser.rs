@@ -14,7 +14,7 @@ fn parse_1<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
     // Keep grabbing additions and subtractions (left associative)
     loop {
         match it.peek() {
-            Some(Token::Add) => {
+            Some(Token::Plus) => {
                 it.next();
                 let rhs = parse_2(it);
                 if let Expression::Add(ref mut v) = expr {
@@ -23,7 +23,7 @@ fn parse_1<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
                     expr = Expression::Add(vec![expr, rhs]);
                 }
             }
-            Some(Token::Subtract) => {
+            Some(Token::Minus) => {
                 it.next();
                 let rhs = parse_2(it);
                 expr = Expression::Sub(Box::new(expr), Box::new(rhs));
@@ -40,7 +40,7 @@ fn parse_2<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
     // Keep grabbing multiplications and divisions (left associative)
     loop {
         match it.peek() {
-            Some(Token::Multiply) => {
+            Some(Token::Times) => {
                 it.next();
                 let rhs = parse_3(it);
                 if let Expression::Mul(ref mut v) = expr {
@@ -78,7 +78,7 @@ fn parse_3<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
 fn parse_4<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression {
     let tok = it.peek().expect("unexpected end of input");
     match tok {
-        Token::Subtract => {
+        Token::Minus => {
             it.next();
             Expression::Neg(Box::new(parse_4(it)))
         }
@@ -107,6 +107,6 @@ fn parse_5<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
 // }
 
 /// Parse an expression into an abstract syntax tree.
-pub fn parse<'a>(mut it: impl Iterator<Item = Token<'a>>) -> Expression {
+pub fn parse<'a>(it: impl Iterator<Item = Token<'a>>) -> Expression {
     parse_1(&mut it.fuse().peekable())
 }

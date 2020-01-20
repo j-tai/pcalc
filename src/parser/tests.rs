@@ -16,7 +16,7 @@ fn paren() {
 
 #[test]
 fn neg() {
-    let tokens = vec![Token::Subtract, Token::Number(2.5)];
+    let tokens = vec![Token::Minus, Token::Number(2.5)];
     assert_eq!(
         parse(tokens.into_iter()),
         Expression::Neg(Box::new(Expression::Num(2.5))),
@@ -58,7 +58,7 @@ fn exp_multiple() {
 
 #[test]
 fn mul() {
-    let tokens = vec![Token::Number(2.5), Token::Multiply, Token::Number(1.5)];
+    let tokens = vec![Token::Number(2.5), Token::Times, Token::Number(1.5)];
     assert_eq!(
         parse(tokens.into_iter()),
         Expression::Mul(vec![Expression::Num(2.5), Expression::Num(1.5)]),
@@ -69,11 +69,11 @@ fn mul() {
 fn mul_multiple() {
     let tokens = vec![
         Token::Number(2.5),
-        Token::Multiply,
+        Token::Times,
         Token::Number(1.5),
-        Token::Multiply,
+        Token::Times,
         Token::Number(0.5),
-        Token::Multiply,
+        Token::Times,
         Token::Number(1.23),
     ];
     assert_eq!(
@@ -127,7 +127,7 @@ fn frac_multiple() {
 
 #[test]
 fn add() {
-    let tokens = vec![Token::Number(2.5), Token::Add, Token::Number(1.5)];
+    let tokens = vec![Token::Number(2.5), Token::Plus, Token::Number(1.5)];
     assert_eq!(
         parse(tokens.into_iter()),
         Expression::Add(vec![Expression::Num(2.5), Expression::Num(1.5)]),
@@ -138,11 +138,11 @@ fn add() {
 fn add_multiple() {
     let tokens = vec![
         Token::Number(2.5),
-        Token::Add,
+        Token::Plus,
         Token::Number(1.5),
-        Token::Add,
+        Token::Plus,
         Token::Number(0.5),
-        Token::Add,
+        Token::Plus,
         Token::Number(1.23),
     ];
     assert_eq!(
@@ -158,7 +158,7 @@ fn add_multiple() {
 
 #[test]
 fn sub() {
-    let tokens = vec![Token::Number(2.5), Token::Subtract, Token::Number(1.5)];
+    let tokens = vec![Token::Number(2.5), Token::Minus, Token::Number(1.5)];
     assert_eq!(
         parse(tokens.into_iter()),
         Expression::Sub(
@@ -172,11 +172,11 @@ fn sub() {
 fn sub_multiple() {
     let tokens = vec![
         Token::Number(2.5),
-        Token::Subtract,
+        Token::Minus,
         Token::Number(1.5),
-        Token::Subtract,
+        Token::Minus,
         Token::Number(0.5),
-        Token::Subtract,
+        Token::Minus,
         Token::Number(1.23),
     ];
     assert_eq!(
@@ -198,11 +198,11 @@ fn sub_multiple() {
 fn nested() {
     let tokens = vec![
         Token::Number(1.0),
-        Token::Add,
+        Token::Plus,
         Token::Number(2.0),
-        Token::Multiply,
+        Token::Times,
         Token::Number(3.0),
-        Token::Add,
+        Token::Plus,
         Token::Number(4.0),
     ];
     assert_eq!(
@@ -219,13 +219,13 @@ fn nested() {
 fn nested_paren() {
     let tokens = vec![
         Token::Number(1.0),
-        Token::Multiply,
+        Token::Times,
         Token::LeftParen,
         Token::Number(2.0),
-        Token::Add,
+        Token::Plus,
         Token::Number(3.0),
         Token::RightParen,
-        Token::Multiply,
+        Token::Times,
         Token::Number(4.0),
     ];
     assert_eq!(
