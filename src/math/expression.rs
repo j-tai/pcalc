@@ -5,6 +5,8 @@ use crate::math::{Context, Result};
 pub enum Expression {
     /// A constant.
     Num(f64),
+    /// Negation of an expression.
+    Neg(Box<Expression>),
 
     /// Addition of two or more expressions.
     Add(Vec<Expression>),
@@ -62,6 +64,7 @@ impl Expression {
         use Expression::*;
         match self {
             Num(n) => Ok(*n),
+            Neg(expr) => Ok(-expr.eval(c)?),
             Add(exprs) => exprs.iter().try_fold(0.0, |a, i| i.eval(c).map(|x| a + x)),
             Sub(lhs, rhs) => Ok(lhs.eval(c)? - rhs.eval(c)?),
             Mul(exprs) => exprs.iter().try_fold(1.0, |a, i| i.eval(c).map(|x| a * x)),
