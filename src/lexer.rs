@@ -21,8 +21,6 @@ pub enum Token<'a> {
     LeftParen,
     /// A right parenthesis `)`.
     RightParen,
-    /// Catch-all for invalid tokens.
-    String(&'a str),
 }
 
 pub fn lex(input: &str) -> impl Iterator<Item = Token> {
@@ -62,10 +60,7 @@ impl<'a> Lex<'a> {
     /// Read a numeric literal.
     fn read_number(&mut self) -> Token<'a> {
         let s = self.read_while(|c| is_ident_char(c) || c == '.');
-        match s.parse() {
-            Ok(n) => Token::Number(n),
-            Err(_) => Token::String(s),
-        }
+        Token::Number(s.parse().expect("invalid numeric literal"))
     }
 
     /// Read an identifier.
@@ -110,11 +105,7 @@ impl<'a> Lex<'a> {
         if is_ident_char(ch) {
             return Some(self.read_ident());
         }
-        // Backup plan...
-        let len = ch.len_utf8();
-        let s = &self.input[..len];
-        self.input = &self.input[len..];
-        Some(Token::String(s))
+        panic!("invalid character: {:?}", ch)
     }
 }
 

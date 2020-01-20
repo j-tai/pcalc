@@ -36,25 +36,6 @@ fn lex_operators_no_space() {
 }
 
 #[test]
-fn lex_invalid() {
-    assert_eq!(lex_v("1234invalid"), vec![String("1234invalid")]);
-}
-
-#[test]
-fn lex_invalid_symbol() {
-    assert_eq!(
-        lex_v("foo$bar   @  baz"),
-        vec![
-            Ident("foo"),
-            String("$"),
-            Ident("bar"),
-            String("@"),
-            Ident("baz"),
-        ],
-    );
-}
-
-#[test]
 fn lex_excess_spaces() {
     assert_eq!(lex_v("   3 +5  "), vec![Number(3.0), Add, Number(5.0)])
 }

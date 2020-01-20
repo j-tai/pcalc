@@ -1,12 +1,8 @@
-use crate::math::{Context, Error, ErrorKind, Result};
+use crate::math::{Context, Result};
 
 /// An abstract syntax tree for a mathematical expression.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expression {
-    /// An unparsed or invalid expression. Such an expression cannot be
-    /// evaluated.
-    Text(String),
-
     /// A constant.
     Num(f64),
 
@@ -64,16 +60,7 @@ impl Expression {
     /// Evaluate the expression.
     pub fn eval(&self, c: &Context) -> Result<f64> {
         use Expression::*;
-        macro_rules! err {
-            ($kind:tt) => {
-                Err(Error {
-                    kind: ErrorKind::$kind,
-                    expr: self,
-                })
-            };
-        }
         match self {
-            Text(_) => err!(Syntax),
             Num(n) => Ok(*n),
             Add(exprs) => exprs.iter().try_fold(0.0, |a, i| i.eval(c).map(|x| a + x)),
             Sub(lhs, rhs) => Ok(lhs.eval(c)? - rhs.eval(c)?),
