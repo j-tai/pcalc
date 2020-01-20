@@ -8,11 +8,11 @@ pub enum Token<'a> {
     /// An identifier.
     Ident(&'a str),
     /// A plus sign `+`.
-    Add,
+    Plus,
     /// A minus sign `-`.
-    Subtract,
+    Minus,
     /// A multiplication sign `*`.
-    Multiply,
+    Times,
     /// A division sign `/`.
     Divide,
     /// An exponentiation sign `^`.
@@ -88,9 +88,9 @@ impl<'a> Lex<'a> {
     fn read_operator(&mut self, ch: char) -> Option<Token<'a>> {
         use Token::*;
         let op = match ch {
-            '+' => Add,
-            '-' => Subtract,
-            '*' => Multiply,
+            '+' => Plus,
+            '-' => Minus,
+            '*' => Times,
             '/' => Divide,
             '^' => Exponent,
             '(' => LeftParen,
