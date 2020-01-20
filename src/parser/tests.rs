@@ -1,6 +1,5 @@
 use crate::lexer::Token;
-use crate::math::Expression;
-use crate::parser::parse;
+use crate::parser::{parse, Expression};
 
 #[test]
 fn num() {
