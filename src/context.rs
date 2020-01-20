@@ -71,8 +71,12 @@ impl Display for Format<'_> {
         } else {
             // Force '+' on exponent
             let s = format!("{:e}", self.num);
-            let e = s.find('e').unwrap();
-            write!(f, "{}e+{}", &s[..e], &s[(e + 1)..])
+            if let Some(e) = s.find('e') {
+                write!(f, "{}e+{}", &s[..e], &s[(e + 1)..])
+            } else {
+                // No 'e' found -- probably +/- infinity
+                write!(f, "{}", s)
+            }
         }
     }
 }
