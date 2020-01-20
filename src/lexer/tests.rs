@@ -1,54 +1,54 @@
 use crate::lexer::Token::*;
 use crate::lexer::*;
 
-fn lex_v(s: &str) -> Vec<Token> {
+fn v(s: &str) -> Vec<Token> {
     // Take only 64 as a failsafe against infinite loops
     lex(s).take(64).collect()
 }
 
 #[test]
-fn lex_numbers() {
-    assert_eq!(lex_v("1.2345 9876"), vec![Number(1.2345), Number(9876.0)]);
+fn numbers() {
+    assert_eq!(v("1.2345 9876"), vec![Number(1.2345), Number(9876.0)]);
 }
 
 #[test]
-fn lex_number_with_exponent() {
+fn number_with_exponent() {
     assert_eq!(
-        lex_v("1.23e4 9876e-4 1e+9"),
+        v("1.23e4 9876e-4 1e+9"),
         vec![Number(1.23e4), Number(9876e-4), Number(1e+9)],
     );
 }
 
 #[test]
-fn lex_number_missing_digits() {
-    assert_eq!(lex_v(".5 1."), vec![Number(0.5), Number(1.0)]);
+fn number_missing_digits() {
+    assert_eq!(v(".5 1."), vec![Number(0.5), Number(1.0)]);
 }
 
 #[test]
-fn lex_idents() {
+fn idents() {
     assert_eq!(
-        lex_v("foo bar xX_Baz_Xx"),
+        v("foo bar xX_Baz_Xx"),
         vec![Ident("foo"), Ident("bar"), Ident("xX_Baz_Xx")],
     );
 }
 
 #[test]
-fn lex_operators() {
+fn operators() {
     assert_eq!(
-        lex_v("+ - * / ^ ( )"),
+        v("+ - * / ^ ( )"),
         vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen],
     );
 }
 
 #[test]
-fn lex_operators_no_space() {
+fn operators_no_space() {
     assert_eq!(
-        lex_v("+-*/^()"),
+        v("+-*/^()"),
         vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen],
     );
 }
 
 #[test]
-fn lex_excess_spaces() {
-    assert_eq!(lex_v("   3 +5  "), vec![Number(3.0), Plus, Number(5.0)])
+fn excess_spaces() {
+    assert_eq!(v("   3 +5  "), vec![Number(3.0), Plus, Number(5.0)])
 }
