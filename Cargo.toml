@@ -4,4 +4,13 @@ version = "0.0.1"
 authors = ["Jasmine Tai <jtai@jtai.ca>"]
 edition = "2018"
 
+[lib]
+name = "pcalc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pcalc"
+path = "src/main.rs"
+
 [dependencies]
+
