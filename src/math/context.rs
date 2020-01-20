@@ -61,9 +61,12 @@ struct Format<'a> {
 
 impl Display for Format<'_> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if self.ctx.notation_range.0 < self.num && self.num < self.ctx.notation_range.1 {
+        let mag = self.num.abs();
+        if self.ctx.notation_range.0 < mag && mag < self.ctx.notation_range.1 || mag == 0.0 {
+            // Show number normally (no scientific notation) if within the range
+            // or equal to zero
             write!(f, "{}", self.num)
-        } else if self.num < 1.0 {
+        } else if mag < 1.0 {
             write!(f, "{:e}", self.num)
         } else {
             // Force '+' on exponent
