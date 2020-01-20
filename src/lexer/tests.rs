@@ -12,6 +12,19 @@ fn lex_numbers() {
 }
 
 #[test]
+fn lex_number_with_exponent() {
+    assert_eq!(
+        lex_v("1.23e4 9876e-4 1e+9"),
+        vec![Number(1.23e4), Number(9876e-4), Number(1e+9)],
+    );
+}
+
+#[test]
+fn lex_number_missing_digits() {
+    assert_eq!(lex_v(".5 1."), vec![Number(0.5), Number(1.0)]);
+}
+
+#[test]
 fn lex_idents() {
     assert_eq!(
         lex_v("foo bar xX_Baz_Xx"),

@@ -37,9 +37,9 @@ fn is_ident_char(ch: char) -> bool {
 }
 
 impl<'a> Lex<'a> {
-    fn read_while<F: FnMut(char) -> bool>(&mut self, mut f: F) -> &'a str {
+    fn read_while<F: FnMut(char) -> bool>(&mut self, start: usize, mut f: F) -> usize {
         let mut end;
-        let mut char_indices = self.input.char_indices();
+        let mut char_indices = self.input[start..].char_indices();
         loop {
             if let Some((i, ch)) = char_indices.next() {
                 end = i;
@@ -48,24 +48,40 @@ impl<'a> Lex<'a> {
                     break;
                 }
             } else {
-                end = self.input.len();
-                break;
+                return self.input.len();
             }
         }
-        let s = &self.input[..end];
-        self.input = &self.input[end..];
-        s
+        start + end
     }
 
     /// Read a numeric literal.
     fn read_number(&mut self) -> Token<'a> {
-        let s = self.read_while(|c| is_ident_char(c) || c == '.');
+        let mut end = 0;
+        end = self.read_while(end, |c| c.is_digit(10));
+        if self.input[end..].chars().next() == Some('.') {
+            end = end + 1;
+            end = self.read_while(end, |c| c.is_digit(10));
+        }
+        if let Some('e') | Some('E') = self.input[end..].chars().next() {
+            end = end + 1;
+            // Consume a + or -
+            if let Some('+') | Some('-') = self.input[end..].chars().next() {
+                end = end + 1;
+            }
+            // Consume exponent
+            end = self.read_while(end, |c| c.is_digit(10));
+        }
+        let s = &self.input[..end];
+        self.input = &self.input[end..];
         Token::Number(s.parse().expect("invalid numeric literal"))
     }
 
     /// Read an identifier.
     fn read_ident(&mut self) -> Token<'a> {
-        Token::Ident(self.read_while(is_ident_char))
+        let end = self.read_while(0, is_ident_char);
+        let s = &self.input[..end];
+        self.input = &self.input[end..];
+        Token::Ident(s)
     }
 
     /// Read an operator.
