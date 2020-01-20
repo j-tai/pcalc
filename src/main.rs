@@ -1,9 +1,15 @@
 use std::env;
 
-use crate::math::Context;
+pub use crate::context::*;
+pub use crate::error::*;
+pub use crate::interpreter::*;
+pub use crate::lexer::*;
+pub use crate::parser::*;
 
+mod context;
+mod error;
+mod interpreter;
 mod lexer;
-mod math;
 mod parser;
 
 fn main() {
@@ -12,7 +18,7 @@ fn main() {
         println!("{}", s);
         let tokens = lexer::lex(&s);
         let expr = parser::parse(tokens);
-        let val = expr.eval(&context).unwrap();
+        let val = eval(&expr, &context).unwrap();
         println!("  = {}", context.display(val));
     }
 }
