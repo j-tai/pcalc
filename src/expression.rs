@@ -11,17 +11,17 @@ pub enum Expression {
     /// Addition of two or more expressions.
     Add(Vec<Expression>),
     /// Subtraction of two expressions.
-    Sub(Box<Expression>, Box<Expression>),
+    Sub(Box<[Expression; 2]>),
     /// Multipication of two or more expressions.
     Mul(Vec<Expression>),
     /// A fraction with a numerator expression and denominator expression.
-    Frac(Box<Expression>, Box<Expression>),
+    Frac(Box<[Expression; 2]>),
     /// An exponent with a base expression and an exponent expression.
-    Exp(Box<Expression>, Box<Expression>),
+    Exp(Box<[Expression; 2]>),
     /// A radical with a radicand expression and an index expression.
-    Root(Box<Expression>, Box<Expression>),
+    Root(Box<[Expression; 2]>),
     /// A logarithm with an expression and a base expression.
-    Log(Box<Expression>, Box<Expression>),
+    Log(Box<[Expression; 2]>),
 
     /// A mathematical constant.
     Const(Constant),

@@ -25,7 +25,7 @@ fn parse_1<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
             Some(Token::Minus) => {
                 it.next();
                 let rhs = parse_2(it);
-                expr = Expression::Sub(Box::new(expr), Box::new(rhs));
+                expr = Expression::Sub(Box::new([expr, rhs]));
             }
             _ => break,
         }
@@ -51,7 +51,7 @@ fn parse_2<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
             Some(Token::Divide) => {
                 it.next();
                 let rhs = parse_3(it);
-                expr = Expression::Frac(Box::new(expr), Box::new(rhs));
+                expr = Expression::Frac(Box::new([expr, rhs]));
             }
             _ => break,
         }
@@ -67,7 +67,7 @@ fn parse_3<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
             it.next();
             // Right associative
             let rhs = parse_3(it);
-            Expression::Exp(Box::new(lhs), Box::new(rhs))
+            Expression::Exp(Box::new([lhs, rhs]))
         }
         _ => lhs,
     }
