@@ -69,12 +69,12 @@ impl Function {
             Function::Asin => Ok(ctx.angle.from_rad(x.asin())),
             Function::Acos => Ok(ctx.angle.from_rad(x.acos())),
             Function::Atan => Ok(ctx.angle.from_rad(x.atan())),
-            Function::Sinh => Ok(ctx.angle.to_rad(x).sinh()),
-            Function::Cosh => Ok(ctx.angle.to_rad(x).cosh()),
-            Function::Tanh => Ok(ctx.angle.to_rad(x).tanh()),
-            Function::Asinh => Ok(ctx.angle.from_rad(x.asinh())),
-            Function::Acosh => Ok(ctx.angle.from_rad(x.acosh())),
-            Function::Atanh => Ok(ctx.angle.from_rad(x.atanh())),
+            Function::Sinh => Ok(x.sinh()),
+            Function::Cosh => Ok(x.cosh()),
+            Function::Tanh => Ok(x.tanh()),
+            Function::Asinh => Ok(x.asinh()),
+            Function::Acosh => Ok(x.acosh()),
+            Function::Atanh => Ok(x.atanh()),
         }
     }
 }
