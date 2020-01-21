@@ -1,3 +1,5 @@
+use crate::{Constant, Function};
+
 /// An abstract syntax tree for a mathematical expression.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expression {
@@ -21,37 +23,9 @@ pub enum Expression {
     /// A logarithm with an expression and a base expression.
     Log(Box<Expression>, Box<Expression>),
 
-    /// The mathematical constant pi.
-    Pi,
-    /// The mathematical constant e.
-    E,
+    /// A mathematical constant.
+    Const(Constant),
 
-    /// The absolute value function.
-    Abs(Box<Expression>),
-
-    /// The sine function.
-    Sin(Box<Expression>),
-    /// The cosine function.
-    Cos(Box<Expression>),
-    /// The tangent function.
-    Tan(Box<Expression>),
-    /// The inverse sine function.
-    Asin(Box<Expression>),
-    /// The inverse cosine function.
-    Acos(Box<Expression>),
-    /// The inverse tangent function.
-    Atan(Box<Expression>),
-
-    /// The hyperbolic sine function.
-    Sinh(Box<Expression>),
-    /// The hyperbolic cosine function.
-    Cosh(Box<Expression>),
-    /// The hyperbolic tangent function.
-    Tanh(Box<Expression>),
-    /// The inverse hyperbolic sine function.
-    Asinh(Box<Expression>),
-    /// The inverse hyperbolic cosine function.
-    Acosh(Box<Expression>),
-    /// The inverse hyperbolic tangent function.
-    Atanh(Box<Expression>),
+    /// A call to a function.
+    Func(Function, Box<Expression>),
 }
