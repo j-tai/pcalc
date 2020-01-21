@@ -1,7 +1,11 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Context {
     pub angle: AngleMeasure,
     pub notation_range: (f64, f64),
@@ -25,6 +29,7 @@ impl Default for Context {
 
 /// Angle measurement unit: degrees or radians.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum AngleMeasure {
     Degrees,
     Radians,
