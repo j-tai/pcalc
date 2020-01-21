@@ -1,5 +1,5 @@
-use crate::lexer::Token::*;
-use crate::lexer::*;
+use crate::Token::*;
+use crate::{lex, Token};
 
 fn v(s: &str) -> Vec<Token> {
     // Take only 64 as a failsafe against infinite loops

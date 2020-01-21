@@ -3,7 +3,7 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::result::Result as StdResult;
 
-use crate::parser::Expression;
+use crate::Expression;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Error<'a> {
