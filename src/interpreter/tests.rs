@@ -1,5 +1,5 @@
 use crate::Expression::*;
-use crate::{eval, Context};
+use crate::{eval, Context, Constant};
 
 #[test]
 fn num() {
@@ -62,13 +62,13 @@ fn log() {
 }
 
 #[test]
-fn pi() {
-    let x = Pi;
+fn const_pi() {
+    let x = Const(Constant::Pi);
     assert_eq!(eval(&x, &Context::default()), Ok(std::f64::consts::PI));
 }
 
 #[test]
-fn e() {
-    let x = E;
+fn const_e() {
+    let x = Const(Constant::E);
     assert_eq!(eval(&x, &Context::default()), Ok(std::f64::consts::E));
 }
