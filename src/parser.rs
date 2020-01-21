@@ -7,6 +7,23 @@ use crate::{Expression, Token};
 #[cfg(test)]
 mod tests;
 
+/// Parse a zeroth-level expression: variable assignment.
+fn parse_0<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression {
+    let expr = parse_1(it);
+    if let Some(&Token::Equals) = it.peek() {
+        it.next();
+        match expr {
+            Expression::Var(s) => {
+                let rhs = parse_1(it);
+                Expression::Let(s, Box::new(rhs))
+            }
+            _ => panic!("Unexpected Equals token"),
+        }
+    } else {
+        expr
+    }
+}
+
 /// Parse a first-level expression: addition and subtraction.
 fn parse_1<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression {
     let mut expr = parse_2(it);
@@ -121,5 +138,5 @@ fn parse_5<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
 
 /// Parse an expression into an abstract syntax tree.
 pub fn parse<'a>(it: impl Iterator<Item = Token<'a>>) -> Expression {
-    parse_1(&mut it.fuse().peekable())
+    parse_0(&mut it.fuse().peekable())
 }

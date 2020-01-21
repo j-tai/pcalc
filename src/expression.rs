@@ -30,4 +30,6 @@ pub enum Expression {
 
     /// A reference to a variable.
     Var(String),
+    /// An assignment to a variable.
+    Let(String, Box<Expression>),
 }

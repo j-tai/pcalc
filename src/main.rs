@@ -5,14 +5,14 @@ use std::io::{BufRead, BufReader};
 use pcalc::{eval, lex, parse, Context};
 
 fn main() {
-    let context = Context::default();
+    let mut context = Context::default();
 
     let mut did_calc = false;
     for s in env::args().skip(1) {
         println!("{}", s);
         let tokens = lex(&s);
         let expr = parse(tokens);
-        let val = eval(&expr, &context).unwrap();
+        let val = eval(&expr, &mut context).unwrap();
         println!("  = {}", context.display(val));
         did_calc = true;
     }
@@ -24,7 +24,7 @@ fn main() {
             let line = line.unwrap();
             let tokens = lex(&line);
             let expr = parse(tokens);
-            let val = eval(&expr, &context).unwrap();
+            let val = eval(&expr, &mut context).unwrap();
             println!("  = {}", context.display(val));
         }
     }

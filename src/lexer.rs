@@ -75,6 +75,7 @@ impl<'a> Lex<'a> {
             '^' => Exponent,
             '(' => LeftParen,
             ')' => RightParen,
+            '=' => Equals,
             _ => return None,
         };
         self.input = &self.input[1..];

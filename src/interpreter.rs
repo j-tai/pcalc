@@ -4,7 +4,7 @@ use crate::{Context, Error, ErrorKind, Expression, Result};
 mod tests;
 
 /// Evaluate the expression.
-pub fn eval<'a>(expr: &'a Expression, c: &Context) -> Result<'a, f64> {
+pub fn eval<'a>(expr: &'a Expression, c: &mut Context) -> Result<'a, f64> {
     use crate::Expression::*;
     match expr {
         Num(n) => Ok(*n),
@@ -27,6 +27,11 @@ pub fn eval<'a>(expr: &'a Expression, c: &Context) -> Result<'a, f64> {
                     expr,
                 })
             }
+        }
+        Let(var, expr) => {
+            let x = eval(expr, c)?;
+            c.vars.insert(var.clone(), x);
+            Ok(x)
         }
     }
 }

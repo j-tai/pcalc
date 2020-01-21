@@ -35,16 +35,16 @@ fn idents() {
 #[test]
 fn operators() {
     assert_eq!(
-        v("+ - * / ^ ( )"),
-        vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen],
+        v("+ - * / ^ ( ) ="),
+        vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen, Equals],
     );
 }
 
 #[test]
 fn operators_no_space() {
     assert_eq!(
-        v("+-*/^()"),
-        vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen],
+        v("+-*/^()="),
+        vec![Plus, Minus, Times, Divide, Exponent, LeftParen, RightParen, Equals],
     );
 }
 
