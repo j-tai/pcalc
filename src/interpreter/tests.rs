@@ -1,5 +1,5 @@
 use crate::Expression::*;
-use crate::{eval, Context, Constant};
+use crate::{eval, Constant, Context};
 
 #[test]
 fn num() {
