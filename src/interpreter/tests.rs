@@ -19,7 +19,7 @@ fn add() {
 
 #[test]
 fn sub() {
-    let x = Sub(Box::new(Num(5.0)), Box::new(Num(3.0)));
+    let x = Sub(Box::new([Num(5.0), Num(3.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(2.0));
 }
 
@@ -33,31 +33,31 @@ fn mul() {
 
 #[test]
 fn frac() {
-    let x = Frac(Box::new(Num(5.0)), Box::new(Num(2.0)));
+    let x = Frac(Box::new([Num(5.0), Num(2.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(2.5));
 }
 
 #[test]
 fn exp() {
-    let x = Exp(Box::new(Num(3.0)), Box::new(Num(2.0)));
+    let x = Exp(Box::new([Num(3.0), Num(2.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(9.0));
-    let x = Exp(Box::new(Num(2.0)), Box::new(Num(3.0)));
+    let x = Exp(Box::new([Num(2.0), Num(3.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(8.0));
 }
 
 #[test]
 fn root() {
-    let x = Root(Box::new(Num(9.0)), Box::new(Num(2.0)));
+    let x = Root(Box::new([Num(9.0), Num(2.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(3.0));
-    let x = Root(Box::new(Num(8.0)), Box::new(Num(3.0)));
+    let x = Root(Box::new([Num(8.0), Num(3.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(2.0));
 }
 
 #[test]
 fn log() {
-    let x = Log(Box::new(Num(9.0)), Box::new(Num(3.0)));
+    let x = Log(Box::new([Num(9.0), Num(3.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(2.0));
-    let x = Log(Box::new(Num(8.0)), Box::new(Num(2.0)));
+    let x = Log(Box::new([Num(8.0), Num(2.0)]));
     assert_eq!(eval(&x, &Context::default()), Ok(3.0));
 }
 
