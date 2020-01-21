@@ -5,6 +5,9 @@ use std::str::FromStr;
 
 use crate::{Context, Error};
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Constant {
     Pi,
