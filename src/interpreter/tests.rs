@@ -72,3 +72,12 @@ fn const_e() {
     let x = Const(Constant::E);
     assert_eq!(eval(&x, &Context::default()), Ok(std::f64::consts::E));
 }
+
+#[test]
+fn var() {
+    let mut ctx = Context::default();
+    ctx.vars.insert("x".to_string(), 1.5);
+    ctx.vars.insert("foo".to_string(), 2.5);
+    let x = Add(vec![Var("x".to_string()), Var("foo".to_string())]);
+    assert_eq!(eval(&x, &ctx), Ok(4.0));
+}

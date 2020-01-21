@@ -1,4 +1,4 @@
-use crate::{Context, Expression, Result};
+use crate::{Context, Error, ErrorKind, Expression, Result};
 
 #[cfg(test)]
 mod tests;
@@ -18,5 +18,15 @@ pub fn eval<'a>(expr: &'a Expression, c: &Context) -> Result<'a, f64> {
         Log(args) => Ok(eval(&args[0], c)?.log(eval(&args[1], c)?)),
         Const(con) => Ok(con.value()),
         Func(f, expr) => Ok(f.apply(eval(expr, c)?, c)?),
+        Var(var) => {
+            if let Some(val) = c.vars.get(var.as_str()) {
+                Ok(*val)
+            } else {
+                Err(Error {
+                    kind: ErrorKind::Undefined,
+                    expr,
+                })
+            }
+        }
     }
 }

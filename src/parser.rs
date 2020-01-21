@@ -107,7 +107,7 @@ fn parse_5<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
             if let Ok(con) = id.parse() {
                 Expression::Const(con)
             } else {
-                panic!("unknown identifier {:?}", id)
+                Expression::Var(id.to_string())
             }
         }
         tok => panic!("unexpected token {:?}", tok),

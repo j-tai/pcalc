@@ -27,6 +27,8 @@ pub enum ErrorKind {
     Domain,
     /// Division or modulo by zero.
     DivZero,
+    /// Tried to access an undefined variable.
+    Undefined,
 }
 
 impl Display for ErrorKind {
