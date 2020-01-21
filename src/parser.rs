@@ -75,13 +75,20 @@ fn parse_3<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
 
 /// Parse a fourth-level expression: functions and prefix unary operators.
 fn parse_4<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression {
-    let tok = it.peek().expect("unexpected end of input");
-    match tok {
-        Token::Minus => {
+    match it.peek() {
+        Some(Token::Minus) => {
             it.next();
             Expression::Neg(Box::new(parse_4(it)))
         }
-        // TODO: Parse functions
+        Some(Token::Ident(id)) => {
+            if let Ok(func) = id.parse() {
+                it.next();
+                let expr = parse_5(it);
+                Expression::Func(func, Box::new(expr))
+            } else {
+                parse_5(it)
+            }
+        }
         _ => parse_5(it),
     }
 }
@@ -96,6 +103,13 @@ fn parse_5<'a>(it: &mut Peekable<impl Iterator<Item = Token<'a>>>) -> Expression
             expr
         }
         Token::Number(n) => Expression::Num(n),
+        Token::Ident(id) => {
+            if let Ok(con) = id.parse() {
+                Expression::Const(con)
+            } else {
+                panic!("unknown identifier {:?}", id)
+            }
+        }
         tok => panic!("unexpected token {:?}", tok),
     }
 }
