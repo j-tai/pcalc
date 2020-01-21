@@ -224,3 +224,12 @@ fn var() {
         ])
     )
 }
+
+#[test]
+fn r#let() {
+    let tokens = vec![Ident("x"), Equals, Number(2.0), Plus, Number(2.0)];
+    assert_eq!(
+        parse(tokens.into_iter()),
+        Let("x".to_string(), Box::new(Add(vec![Num(2.0), Num(2.0)])))
+    )
+}

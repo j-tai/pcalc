@@ -18,4 +18,6 @@ pub enum Token<'a> {
     LeftParen,
     /// A right parenthesis `)`.
     RightParen,
+    /// An equal sign `=`.
+    Equals,
 }
