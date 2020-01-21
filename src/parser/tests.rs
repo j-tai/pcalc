@@ -1,4 +1,4 @@
-use crate::{parse, Expression, Token};
+use crate::{parse, Constant, Expression, Function, Token};
 
 #[test]
 fn num() {
@@ -233,5 +233,45 @@ fn nested_paren() {
             Expression::Add(vec![Expression::Num(2.0), Expression::Num(3.0)]),
             Expression::Num(4.0),
         ]),
+    )
+}
+
+#[test]
+fn constants() {
+    let tokens = vec![Token::Ident("pi"), Token::Times, Token::Ident("e")];
+    assert_eq!(
+        parse(tokens.into_iter()),
+        Expression::Mul(vec![
+            Expression::Const(Constant::Pi),
+            Expression::Const(Constant::E),
+        ])
+    )
+}
+
+#[test]
+fn functions() {
+    let tokens = vec![
+        Token::Ident("sin"),
+        Token::Number(12.34),
+        Token::Plus,
+        Token::Ident("atan"),
+        Token::LeftParen,
+        Token::Number(5.6),
+        Token::Minus,
+        Token::Number(5.7),
+        Token::RightParen,
+    ];
+    assert_eq!(
+        parse(tokens.into_iter()),
+        Expression::Add(vec![
+            Expression::Func(Function::Sin, Box::new(Expression::Num(12.34))),
+            Expression::Func(
+                Function::Atan,
+                Box::new(Expression::Sub(
+                    Box::new(Expression::Num(5.6)),
+                    Box::new(Expression::Num(5.7)),
+                ))
+            ),
+        ])
     )
 }
