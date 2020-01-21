@@ -211,3 +211,16 @@ fn functions() {
         ])
     )
 }
+
+#[test]
+fn var() {
+    let tokens = vec![Ident("x"), Plus, Ident("foo"), Plus, Ident("hello_world")];
+    assert_eq!(
+        parse(tokens.into_iter()),
+        Add(vec![
+            Var("x".to_string()),
+            Var("foo".to_string()),
+            Var("hello_world".to_string()),
+        ])
+    )
+}

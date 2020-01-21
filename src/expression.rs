@@ -25,7 +25,9 @@ pub enum Expression {
 
     /// A mathematical constant.
     Const(Constant),
-
     /// A call to a function.
     Func(Function, Box<Expression>),
+
+    /// A reference to a variable.
+    Var(String),
 }

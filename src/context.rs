@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
@@ -9,6 +10,7 @@ use serde::{Deserialize, Serialize};
 pub struct Context {
     pub angle: AngleMeasure,
     pub notation_range: (f64, f64),
+    pub vars: HashMap<String, f64>,
 }
 
 impl Context {
@@ -23,6 +25,7 @@ impl Default for Context {
         Context {
             angle: Default::default(),
             notation_range: (1.0e-3, 1.0e+7),
+            vars: Default::default(),
         }
     }
 }
