@@ -5,6 +5,7 @@ pub use crate::expression::*;
 pub use crate::interpreter::*;
 pub use crate::lexer::*;
 pub use crate::parser::*;
+pub use crate::span::*;
 pub use crate::token::*;
 
 mod builtin;
@@ -14,4 +15,5 @@ mod expression;
 mod interpreter;
 mod lexer;
 mod parser;
+mod span;
 mod token;
