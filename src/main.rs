@@ -8,7 +8,7 @@ fn run_expr(expr: &str, ctx: &mut Context) {
     if expr.is_empty() {
         return;
     }
-    let tokens = lex(&expr);
+    let tokens = lex(&expr, None);
     let expr = parse(tokens);
     let val = eval(&expr, ctx).unwrap();
     println!("  = {}", ctx.display(val));

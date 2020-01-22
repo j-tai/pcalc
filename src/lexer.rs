@@ -1,14 +1,24 @@
 #[cfg(test)]
 mod tests;
 
-use crate::Token;
+use std::rc::Rc;
 
-pub fn lex(input: &str) -> impl Iterator<Item = Token> {
-    Lex { input }
+use crate::{Span, Token};
+
+pub fn lex(input: &str, file: Option<String>) -> impl Iterator<Item = (Token, Span)> {
+    Lex {
+        input,
+        file: file.map(Rc::new),
+        line: 1,
+        col: 1,
+    }
 }
 
 struct Lex<'a> {
     input: &'a str,
+    file: Option<Rc<String>>,
+    line: u32,
+    col: u32,
 }
 
 /// Return whether this character is acceptable in an identifier.
@@ -17,7 +27,35 @@ fn is_ident_char(ch: char) -> bool {
 }
 
 impl<'a> Lex<'a> {
-    fn read_while<F: FnMut(char) -> bool>(&mut self, start: usize, mut f: F) -> usize {
+    fn advance(&mut self, amt: usize) {
+        let s = &self.input[..amt];
+        self.input = &self.input[amt..];
+        for ch in s.chars() {
+            match ch {
+                '\n' => {
+                    self.line += 1;
+                    self.col = 1;
+                }
+                _ => self.col += 1,
+            }
+        }
+    }
+
+    fn advance_span(&mut self, amt: usize) -> Span {
+        let start = self.col;
+        let line = self.line;
+        self.advance(amt);
+        assert_eq!(self.line, line);
+        let end = self.col - 1;
+        Span {
+            file: self.file.clone(),
+            line,
+            start,
+            end,
+        }
+    }
+
+    fn read_while<F: FnMut(char) -> bool>(&self, start: usize, mut f: F) -> usize {
         let mut end;
         let mut char_indices = self.input[start..].char_indices();
         loop {
@@ -35,7 +73,7 @@ impl<'a> Lex<'a> {
     }
 
     /// Read a numeric literal.
-    fn read_number(&mut self) -> Token<'a> {
+    fn read_number(&mut self) -> (Token<'a>, Span) {
         let mut end = 0;
         end = self.read_while(end, |c| c.is_digit(10));
         if self.input[end..].chars().next() == Some('.') {
@@ -52,20 +90,21 @@ impl<'a> Lex<'a> {
             end = self.read_while(end, |c| c.is_digit(10));
         }
         let s = &self.input[..end];
-        self.input = &self.input[end..];
-        Token::Number(s.parse().expect("invalid numeric literal"))
+        (
+            Token::Number(s.parse().expect("invalid numeric literal")),
+            self.advance_span(end),
+        )
     }
 
     /// Read an identifier.
-    fn read_ident(&mut self) -> Token<'a> {
+    fn read_ident(&mut self) -> (Token<'a>, Span) {
         let end = self.read_while(0, is_ident_char);
         let s = &self.input[..end];
-        self.input = &self.input[end..];
-        Token::Ident(s)
+        (Token::Ident(s), self.advance_span(end))
     }
 
     /// Read an operator.
-    fn read_operator(&mut self, ch: char) -> Option<Token<'a>> {
+    fn read_operator(&mut self, ch: char) -> Option<(Token<'a>, Span)> {
         use Token::*;
         let op = match ch {
             '+' => Plus,
@@ -78,13 +117,14 @@ impl<'a> Lex<'a> {
             '=' => Equals,
             _ => return None,
         };
-        self.input = &self.input[1..];
-        Some(op)
+        Some((op, self.advance_span(1)))
     }
 
     /// Read a token.
-    fn read_token(&mut self) -> Option<Token<'a>> {
-        self.input = self.input.trim_start();
+    fn read_token(&mut self) -> Option<(Token<'a>, Span)> {
+        // Trim whitespace from input
+        let n = self.read_while(0, |c| c.is_whitespace());
+        self.advance(n);
         // End of input?
         if self.input.is_empty() {
             return None;
@@ -107,9 +147,9 @@ impl<'a> Lex<'a> {
 }
 
 impl<'a> Iterator for Lex<'a> {
-    type Item = Token<'a>;
+    type Item = (Token<'a>, Span);
 
-    fn next(&mut self) -> Option<Token<'a>> {
+    fn next(&mut self) -> Option<(Token<'a>, Span)> {
         self.read_token()
     }
 }
