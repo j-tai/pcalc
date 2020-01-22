@@ -63,7 +63,7 @@ pub enum Function {
 }
 
 impl Function {
-    pub fn apply(self, x: f64, ctx: &Context) -> Result<f64, Error<'static>> {
+    pub fn apply(self, x: f64, ctx: &Context) -> Result<f64, Error> {
         match self {
             Function::Abs => Ok(x.abs()),
             Function::Sin => Ok(ctx.angle.to_rad(x).sin()),

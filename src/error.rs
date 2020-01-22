@@ -3,17 +3,14 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::result::Result as StdResult;
 
-use crate::Expression;
-
 #[derive(Clone, Debug, PartialEq)]
-pub struct Error<'a> {
+pub struct Error {
     pub kind: ErrorKind,
-    pub expr: &'a Expression,
 }
 
-impl StdError for Error<'_> {}
+impl StdError for Error {}
 
-impl Display for Error<'_> {
+impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "{}", self.kind)
     }
@@ -37,4 +34,4 @@ impl Display for ErrorKind {
     }
 }
 
-pub type Result<'a, T> = StdResult<T, Error<'a>>;
+pub type Result<T> = StdResult<T, Error>;
