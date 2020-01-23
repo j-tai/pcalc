@@ -1,37 +1,24 @@
-use std::error::Error as StdError;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::result::Result as StdResult;
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Error {
-    pub kind: ErrorKind,
-}
+use crate::Span;
 
-impl StdError for Error {}
+#[derive(Clone, Debug, PartialEq)]
+pub enum Error {
+    /// Syntax error.
+    Syntax,
+    /// Tried to access an undefined variable.
+    Undefined(String),
+}
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}", self.kind)
+        match self {
+            Error::Syntax => write!(f, "Syntax error"),
+            Error::Undefined(v) => write!(f, "Undefined variable '{}'", v),
+        }
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum ErrorKind {
-    /// Syntax error.
-    Syntax,
-    /// Argument is outside the domain of the function.
-    Domain,
-    /// Division or modulo by zero.
-    DivZero,
-    /// Tried to access an undefined variable.
-    Undefined,
-}
-
-impl Display for ErrorKind {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-pub type Result<T> = StdResult<T, Error>;
+pub type Result<T> = StdResult<T, (Error, Span)>;

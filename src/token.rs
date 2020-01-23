@@ -20,4 +20,6 @@ pub enum Token<'a> {
     RightParen,
     /// An equal sign `=`.
     Equals,
+    /// End of file or input.
+    Eof,
 }
