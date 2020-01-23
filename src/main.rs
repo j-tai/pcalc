@@ -16,7 +16,13 @@ fn run_expr(expr: &str, ctx: &mut Context) {
             return;
         }
     };
-    let val = eval(&expr, ctx).unwrap();
+    let val = match eval(&expr, ctx) {
+        Ok(e) => e,
+        Err((err, span)) => {
+            eprintln!("{}: {}", span, err);
+            return;
+        }
+    };
     println!("  = {}", ctx.display(val));
 }
 
