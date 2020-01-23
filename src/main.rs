@@ -2,7 +2,18 @@ use std::env;
 use std::io;
 use std::io::{BufRead, BufReader};
 
-use pcalc::{eval, lex, parse, Context};
+use pcalc::{eval, lex, parse, Context, Error, Span};
+
+fn show_err(err: Error, span: Span) {
+    for _ in 1..span.start {
+        eprint!(" ");
+    }
+    for _ in span.start..=span.end {
+        eprint!("^");
+    }
+    eprintln!();
+    eprintln!("{}: {}", err, span);
+}
 
 fn run_expr(expr: &str, ctx: &mut Context) {
     if expr.is_empty() {
@@ -12,14 +23,14 @@ fn run_expr(expr: &str, ctx: &mut Context) {
     let expr = match parse(tokens) {
         Ok(e) => e,
         Err((err, span)) => {
-            eprintln!("{}: {}", span, err);
+            show_err(err, span);
             return;
         }
     };
     let val = match eval(&expr, ctx) {
         Ok(e) => e,
         Err((err, span)) => {
-            eprintln!("{}: {}", span, err);
+            show_err(err, span);
             return;
         }
     };
