@@ -7,6 +7,25 @@ use crate::{Error, Expression, Result, Span, Token};
 #[cfg(test)]
 mod tests;
 
+/// Parse a zeroth-level expression: comman operators.
+fn parse_0<'a>(
+    it: &mut Peekable<impl Iterator<Item = (Token<'a>, Span)>>,
+) -> Result<(Expression, Span)> {
+    let mut expr = parse_1(it)?;
+    loop {
+        if let (Token::Comma, _) = it.peek().unwrap() {
+            let (_, span) = it.next().unwrap();
+            let rhs = parse_1(it)?;
+            match expr {
+                (Expression::Comma(ref mut v), _) => v.push(rhs),
+                _ => expr = (Expression::Comma(vec![expr, rhs]), span),
+            }
+        } else {
+            break Ok(expr);
+        }
+    }
+}
+
 /// Parse a first-level expression: variable assignment.
 fn parse_1<'a>(
     it: &mut Peekable<impl Iterator<Item = (Token<'a>, Span)>>,
@@ -125,7 +144,7 @@ fn parse_6<'a>(
     let (tok, span) = it.next().unwrap();
     match tok {
         Token::LeftParen => {
-            let expr = parse_2(it)?;
+            let expr = parse_0(it)?;
             let (tok, span) = it.next().unwrap();
             if tok != Token::RightParen {
                 Err((Error::Syntax, span))
@@ -148,7 +167,7 @@ fn parse_6<'a>(
 /// Parse an expression into an abstract syntax tree.
 pub fn parse<'a>(it: impl Iterator<Item = (Token<'a>, Span)>) -> Result<(Expression, Span)> {
     let mut it = it.fuse().peekable();
-    let expr = parse_1(&mut it)?;
+    let expr = parse_0(&mut it)?;
     let (tok, span) = it
         .next()
         .expect("Unexpected end of token stream (missing Token::Eof?)");

@@ -1,6 +1,6 @@
 use crate::Expression::*;
 use crate::Token::*;
-use crate::{parse, Constant, Error, Function, Span, Token};
+use crate::{parse, Constant, Error, Expression, Function, Span, Token};
 
 fn sp() -> Span {
     Span {
@@ -356,6 +356,25 @@ fn r#let() {
                 "x".to_string(),
                 Box::new((Add(vec![(Num(2.0), sp()), (Num(2.0), sp())]), sp())),
             ),
+            sp(),
+        )),
+    );
+}
+
+#[test]
+fn comma() {
+    let tokens = vec![
+        Number(1.0),
+        Token::Comma,
+        Number(2.0),
+        Token::Comma,
+        Number(3.0),
+        Eof,
+    ];
+    assert_eq!(
+        parse(tok(tokens)),
+        Ok((
+            Expression::Comma(vec![(Num(1.0), sp()), (Num(2.0), sp()), (Num(3.0), sp())]),
             sp(),
         )),
     );
