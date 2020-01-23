@@ -1,10 +1,10 @@
-use crate::{Context, Error, ErrorKind, Expression, Result};
+use crate::{Context, Error, Expression, Result, Span};
 
 #[cfg(test)]
 mod tests;
 
 /// Evaluate the expression.
-pub fn eval(expr: &Expression, c: &mut Context) -> Result<f64> {
+pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<f64> {
     use crate::Expression::*;
     match expr {
         Num(n) => Ok(*n),
@@ -17,14 +17,12 @@ pub fn eval(expr: &Expression, c: &mut Context) -> Result<f64> {
         Root(args) => Ok(eval(&args[0], c)?.powf(1.0 / eval(&args[1], c)?)),
         Log(args) => Ok(eval(&args[0], c)?.log(eval(&args[1], c)?)),
         Const(con) => Ok(con.value()),
-        Func(f, expr) => Ok(f.apply(eval(expr, c)?, c)?),
+        Func(f, expr) => f.apply(eval(expr, c)?, c).map_err(|e| (e, span.clone())),
         Var(var) => {
             if let Some(val) = c.vars.get(var.as_str()) {
                 Ok(*val)
             } else {
-                Err(Error {
-                    kind: ErrorKind::Undefined,
-                })
+                Err((Error::Undefined(var.to_string()), span.clone()))
             }
         }
         Let(var, expr) => {

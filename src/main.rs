@@ -9,7 +9,13 @@ fn run_expr(expr: &str, ctx: &mut Context) {
         return;
     }
     let tokens = lex(&expr, None);
-    let expr = parse(tokens);
+    let expr = match parse(tokens) {
+        Ok(e) => e,
+        Err((err, span)) => {
+            eprintln!("{}: {}", span, err);
+            return;
+        }
+    };
     let val = eval(&expr, ctx).unwrap();
     println!("  = {}", ctx.display(val));
 }

@@ -8,6 +8,7 @@ use crate::{Span, Token};
 pub fn lex(input: &str, file: Option<String>) -> impl Iterator<Item = (Token, Span)> {
     Lex {
         input,
+        sent_eof: false,
         file: file.map(Rc::new),
         line: 1,
         col: 1,
@@ -16,6 +17,7 @@ pub fn lex(input: &str, file: Option<String>) -> impl Iterator<Item = (Token, Sp
 
 struct Lex<'a> {
     input: &'a str,
+    sent_eof: bool,
     file: Option<Rc<String>>,
     line: u32,
     col: u32,
@@ -127,7 +129,20 @@ impl<'a> Lex<'a> {
         self.advance(n);
         // End of input?
         if self.input.is_empty() {
-            return None;
+            if self.sent_eof {
+                return None;
+            } else {
+                self.sent_eof = true;
+                return Some((
+                    Token::Eof,
+                    Span {
+                        file: self.file.clone(),
+                        line: self.line,
+                        start: self.col,
+                        end: self.col,
+                    },
+                ));
+            }
         }
         let ch = self.input.chars().next().unwrap();
         // Is this a token?
