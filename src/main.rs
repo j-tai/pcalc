@@ -12,7 +12,7 @@ fn show_err(err: Error, span: Span) {
         eprint!("^");
     }
     eprintln!();
-    eprintln!("{}: {}", err, span);
+    eprintln!("{}: {}", span, err);
 }
 
 fn run_expr(expr: &str, ctx: &mut Context) {
