@@ -30,5 +30,13 @@ pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<f64> {
             c.vars.insert(var.clone(), x);
             Ok(x)
         }
+        Comma(exprs) => {
+            debug_assert!(!exprs.is_empty());
+            let len = exprs.len();
+            for expr in &exprs[..len - 1] {
+                eval(expr, c)?;
+            }
+            eval(exprs.last().unwrap(), c)
+        }
     }
 }

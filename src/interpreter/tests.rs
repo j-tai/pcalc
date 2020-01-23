@@ -124,3 +124,13 @@ fn r#let() {
     assert_eq!(eval(&x, &mut ctx), Ok(2.5));
     assert_eq!(ctx.vars.get("foo"), Some(&2.5));
 }
+
+#[test]
+fn comma() {
+    let mut ctx = ctx();
+    let x = (
+        Comma(vec![(Num(1.0), sp()), (Num(2.0), sp()), (Num(3.0), sp())]),
+        sp(),
+    );
+    assert_eq!(eval(&x, &mut ctx), Ok(3.0));
+}

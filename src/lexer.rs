@@ -117,6 +117,7 @@ impl<'a> Lex<'a> {
             '(' => LeftParen,
             ')' => RightParen,
             '=' => Equals,
+            ',' => Comma,
             _ => return None,
         };
         Some((op, self.advance_span(1)))
