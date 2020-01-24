@@ -1,6 +1,8 @@
+use std::iter::Peekable;
+
 use crate::Expression::*;
 use crate::Token::*;
-use crate::{parse, Constant, Error, Expression, Function, Span, Token};
+use crate::{parse, Constant, Error, Expression, Function, Result, Span, Token, TokenStream};
 
 fn sp() -> Span {
     Span {
@@ -20,8 +22,29 @@ fn spa(start: u32, end: u32) -> Span {
     }
 }
 
-fn tok(tokens: Vec<Token>) -> impl Iterator<Item = (Token, Span)> {
-    tokens.into_iter().map(|t| (t, sp()))
+struct Tokens<'a, T>(Peekable<T>)
+where
+    T: Iterator<Item = (Token<'a>, Span)>;
+
+impl<'a, T> TokenStream<'a> for Tokens<'a, T>
+where
+    T: Iterator<Item = (Token<'a>, Span)>,
+{
+    fn peek(&mut self) -> Result<&(Token<'a>, Span)> {
+        Ok(self.0.peek().unwrap())
+    }
+
+    fn next(&mut self) -> Result<(Token<'a>, Span)> {
+        Ok(self.0.next().unwrap())
+    }
+}
+
+fn tok<'a>(tokens: Vec<Token<'a>>) -> impl TokenStream<'a> {
+    Tokens(tokens.into_iter().map(|t| (t, sp())).peekable())
+}
+
+fn tok2<'a>(tokens: Vec<(Token<'a>, Span)>) -> impl TokenStream<'a> {
+    Tokens(tokens.into_iter().peekable())
 }
 
 #[test]
@@ -391,7 +414,7 @@ fn span() {
         (Eof, spa(6, 6)),
     ];
     assert_eq!(
-        parse(tokens.into_iter()),
+        parse(tok2(tokens)),
         Ok((
             Add(vec![
                 (
@@ -414,5 +437,5 @@ fn err_span() {
         (Number(1.0), spa(4, 4)),
         (Eof, spa(6, 6)),
     ];
-    assert_eq!(parse(tokens.into_iter()), Err((Error::Syntax, spa(3, 3))));
+    assert_eq!(parse(tok2(tokens)), Err((Error::Syntax, spa(3, 3))));
 }

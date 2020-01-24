@@ -1,15 +1,34 @@
 use crate::Token::*;
-use crate::{lex, Span, Token};
+use crate::{lex, Span, Token,TokenStream};
+
+/// Collect the tokens and spans from the input string.
+fn collect(s: &str) -> Vec<(Token, Span)> {
+    let mut v = vec![];
+    let mut l = lex(s, None);
+    loop {
+        let tok = l.next().unwrap();
+        if tok.0 == Eof {
+            v.push(tok);
+            break;
+        } else {
+            v.push(tok);
+        }
+        if v.len() > 64 {
+            // Take only 64 as a failsafe against infinite loops
+            break;
+        }
+    }
+    v
+}
 
 /// Collect the tokens from the input string.
 fn v(s: &str) -> Vec<Token> {
-    // Take only 64 as a failsafe against infinite loops
-    lex(s, None).take(64).map(|(t, _)| t).collect()
+    collect(s).into_iter().map(|(t, _)| t).collect()
 }
 
 /// Collect the spans from the input string.
 fn s(s: &str) -> Vec<Span> {
-    lex(s, None).take(64).map(|(_, s)| s).collect()
+    collect(s).into_iter().map(|(_, s)| s).collect()
 }
 
 /// Create a span at line 1 of standard input with the given start and end
@@ -89,4 +108,22 @@ fn span() {
         s("3^^3"),
         vec![sp(1, 1), sp(2, 2), sp(3, 3), sp(4, 4), sp(5, 5)],
     );
+}
+
+#[test]
+fn peek() {
+    let mut l = lex("1 2 3 4 5", None);
+    assert_eq!(l.peek(), Ok(&(Number(1.0), sp(1, 1))));
+    assert_eq!(l.peek(), Ok(&(Number(1.0), sp(1, 1))));
+    assert_eq!(l.next(), Ok((Number(1.0), sp(1, 1))));
+    assert_eq!(l.next(), Ok((Number(2.0), sp(3, 3))));
+    assert_eq!(l.peek(), Ok(&(Number(3.0), sp(5, 5))));
+    assert_eq!(l.peek(), Ok(&(Number(3.0), sp(5, 5))));
+    assert_eq!(l.next(), Ok((Number(3.0), sp(5, 5))));
+    assert_eq!(l.peek(), Ok(&(Number(4.0), sp(7, 7))));
+    assert_eq!(l.next(), Ok((Number(4.0), sp(7, 7))));
+    assert_eq!(l.next(), Ok((Number(5.0), sp(9, 9))));
+    assert_eq!(l.peek(), Ok(&(Eof, sp(10, 10))));
+    assert_eq!(l.peek(), Ok(&(Eof, sp(10, 10))));
+    assert_eq!(l.next(), Ok((Eof, sp(10, 10))));
 }
