@@ -1,9 +1,12 @@
+//! Error handling.
+
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::result::Result as StdResult;
 
 use crate::Span;
 
+/// A parse or execution error.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Error {
     /// Syntax error.

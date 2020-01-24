@@ -1,3 +1,4 @@
+/// A token.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Token<'a> {
     /// A numeric literal.

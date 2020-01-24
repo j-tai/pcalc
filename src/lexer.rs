@@ -5,6 +5,10 @@ use std::rc::Rc;
 
 use crate::{Span, Token};
 
+/// Lex the `input` into a stream of tokens.
+///
+/// The `file` parameter specifies the filename from which the input
+/// originated. This is to produce better diagnostic messages.
 pub fn lex(input: &str, file: Option<String>) -> impl Iterator<Item = (Token, Span)> {
     Lex {
         input,
@@ -146,7 +150,7 @@ impl<'a> Lex<'a> {
             }
         }
         let ch = self.input.chars().next().unwrap();
-        // Is this a token?
+        // Is this an operator?
         if let Some(tok) = self.read_operator(ch) {
             return Some(tok);
         }
