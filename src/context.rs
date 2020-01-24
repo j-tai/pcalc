@@ -1,3 +1,5 @@
+//! Execution context, options, and variable storage.
+
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -5,6 +7,7 @@ use std::fmt::{Display, Formatter};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+/// Execution context, options, and variables.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Context {
@@ -39,6 +42,7 @@ pub enum AngleMeasure {
 }
 
 impl AngleMeasure {
+    /// Convert the angle from `self`'s angle measure to radians.
     pub fn to_rad(self, value: f64) -> f64 {
         match self {
             AngleMeasure::Degrees => value.to_radians(),
@@ -46,6 +50,7 @@ impl AngleMeasure {
         }
     }
 
+    /// Convert the angle from radians to `self`'s angle measure.
     pub fn from_rad(self, value: f64) -> f64 {
         match self {
             AngleMeasure::Degrees => value.to_degrees(),

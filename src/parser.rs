@@ -164,7 +164,7 @@ fn parse_6<'a>(
     }
 }
 
-/// Parse an expression into an abstract syntax tree.
+/// Parse a stream of tokens into an abstract syntax tree.
 pub fn parse<'a>(it: impl Iterator<Item = (Token<'a>, Span)>) -> Result<(Expression, Span)> {
     let mut it = it.fuse().peekable();
     let expr = parse_0(&mut it)?;

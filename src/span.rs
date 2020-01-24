@@ -2,7 +2,7 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 
-/// A range of characters in a
+/// A range of characters in a file or input stream.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Span {
     /// Filename, or None for standard input.

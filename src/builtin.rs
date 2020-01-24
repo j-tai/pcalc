@@ -1,3 +1,5 @@
+//! Built-in constants and functions.
+
 use std::f64::consts;
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -8,13 +10,18 @@ use crate::{Context, Error};
 #[cfg(test)]
 mod tests;
 
+/// A built-in mathematical constant, such as pi.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Constant {
+    /// Pi, which is the ratio of a circle's semicircumference to its radius.
     Pi,
+    /// E, also known as Euler's number, which is the base of the natural
+    /// logarithm.
     E,
 }
 
 impl Constant {
+    /// Get the value of the constant.
     pub fn value(self) -> f64 {
         match self {
             Constant::Pi => consts::PI,
@@ -45,24 +52,42 @@ impl Display for Constant {
     }
 }
 
+/// A built-in, native function.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Function {
+    /// Absolute value.
     Abs,
+    /// Sine.
     Sin,
+    /// Cosine.
     Cos,
+    /// Tangent.
     Tan,
+    /// Arcsine, also known as inverse sine.
     Asin,
+    /// Arccosine, also known as inverse cosine.
     Acos,
+    /// Arctangent, also known as inverse tangent.
     Atan,
+    /// Hyperbolic sine.
     Sinh,
+    /// Hyperbolic cosine.
     Cosh,
+    /// Hyperbolic tangent.
     Tanh,
+    /// Inverse hyperbolic sine.
     Asinh,
+    /// Inverse hyperbolic cosine.
     Acosh,
+    /// Inverse hyperbolic tangent.
     Atanh,
 }
 
 impl Function {
+    /// Apply the function to a number given a context.
+    ///
+    /// The context is primarily used to determine the angle with which the
+    /// calculation should be performed (i.e., degrees or radians).
     pub fn apply(self, x: f64, ctx: &Context) -> Result<f64, Error> {
         match self {
             Function::Abs => Ok(x.abs()),

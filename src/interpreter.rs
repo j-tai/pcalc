@@ -3,7 +3,7 @@ use crate::{Context, Error, Expression, Result, Span};
 #[cfg(test)]
 mod tests;
 
-/// Evaluate the expression.
+/// Evaluate the expression in the given context.
 pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<f64> {
     use crate::Expression::*;
     match expr {
