@@ -3,28 +3,28 @@ mod tests;
 
 use std::rc::Rc;
 
-use crate::{Span, Token};
+use crate::{Error, Result, Span, Token, TokenStream};
 
 /// Lex the `input` into a stream of tokens.
 ///
 /// The `file` parameter specifies the filename from which the input
 /// originated. This is to produce better diagnostic messages.
-pub fn lex(input: &str, file: Option<String>) -> impl Iterator<Item = (Token, Span)> {
+pub fn lex(input: &str, file: Option<String>) -> impl TokenStream {
     Lex {
         input,
-        sent_eof: false,
         file: file.map(Rc::new),
         line: 1,
         col: 1,
+        peeked: None,
     }
 }
 
 struct Lex<'a> {
     input: &'a str,
-    sent_eof: bool,
     file: Option<Rc<String>>,
     line: u32,
     col: u32,
+    peeked: Option<(Token<'a>, Span)>
 }
 
 /// Return whether this character is acceptable in an identifier.
@@ -128,48 +128,63 @@ impl<'a> Lex<'a> {
     }
 
     /// Read a token.
-    fn read_token(&mut self) -> Option<(Token<'a>, Span)> {
+    fn read_token(&mut self) -> Result<(Token<'a>, Span)> {
         // Trim whitespace from input
         let n = self.read_while(0, |c| c.is_whitespace());
         self.advance(n);
         // End of input?
         if self.input.is_empty() {
-            if self.sent_eof {
-                return None;
-            } else {
-                self.sent_eof = true;
-                return Some((
-                    Token::Eof,
-                    Span {
-                        file: self.file.clone(),
-                        line: self.line,
-                        start: self.col,
-                        end: self.col,
-                    },
-                ));
-            }
+            return Ok((
+                Token::Eof,
+                Span {
+                    file: self.file.clone(),
+                    line: self.line,
+                    start: self.col,
+                    end: self.col,
+                },
+            ));
         }
         let ch = self.input.chars().next().unwrap();
         // Is this an operator?
         if let Some(tok) = self.read_operator(ch) {
-            return Some(tok);
+            return Ok(tok);
         }
         // Is this a numeric literal?
         if ch.is_digit(10) || ch == '.' {
-            return Some(self.read_number());
+            return Ok(self.read_number());
         }
         // Is this an identifier?
         if is_ident_char(ch) {
-            return Some(self.read_ident());
+            return Ok(self.read_ident());
         }
-        panic!("invalid character: {:?}", ch)
+        // Invalid character
+        Err((
+            Error::Syntax,
+            Span {
+                file: self.file.clone(),
+                line: self.line,
+                start: self.col,
+                end: self.col,
+            },
+        ))
     }
 }
 
-impl<'a> Iterator for Lex<'a> {
-    type Item = (Token<'a>, Span);
+impl<'a> TokenStream<'a> for Lex<'a> {
+    fn peek(&mut self) -> Result<&(Token<'a>, Span)> {
+        if let Some(ref tok) = self.peeked {
+            Ok(tok)
+        } else {
+            self.peeked = Some(self.next()?);
+            Ok(self.peeked.as_ref().unwrap())
+        }
+    }
 
-    fn next(&mut self) -> Option<(Token<'a>, Span)> {
-        self.read_token()
+    fn next(&mut self) -> Result<(Token<'a>, Span)> {
+        if let Some(tok) = self.peeked.take() {
+            Ok(tok)
+        } else {
+            self.read_token()
+        }
     }
 }

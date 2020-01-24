@@ -1,3 +1,5 @@
+use crate::{Result, Span};
+
 /// A token.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Token<'a> {
@@ -25,4 +27,15 @@ pub enum Token<'a> {
     Comma,
     /// End of file or input.
     Eof,
+}
+
+/// A stream of tokens, similar to an `Iterator<Item = (Token, Span)`.
+///
+/// `Token::Eof` signals the end of the token stream, and trying to retrieve
+/// further tokens results in a panic. If an `Err` is returned, then `peek` and
+/// `next` should not be called again; otherwise, the calls may produce panics
+/// or undefined results.
+pub trait TokenStream<'a> {
+    fn peek(&mut self) -> Result<&(Token<'a>, Span)>;
+    fn next(&mut self) -> Result<(Token<'a>, Span)>;
 }
