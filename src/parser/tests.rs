@@ -439,3 +439,18 @@ fn err_span() {
     ];
     assert_eq!(parse(tok2(tokens)), Err((Error::Syntax, spa(3, 3))));
 }
+
+#[test]
+fn func_neg() {
+    let tokens = vec![Ident("sin"), Minus, Number(1.0), Eof];
+    assert_eq!(
+        parse(tok(tokens)),
+        Ok((
+            Func(
+                Function::Sin,
+                Box::new((Neg(Box::new((Num(1.0), sp()))), sp())),
+            ),
+            sp(),
+        )),
+    );
+}

@@ -113,7 +113,7 @@ fn parse_5<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
         (Token::Ident(id), _) => {
             if let Ok(func) = id.parse() {
                 let (_, span) = it.next()?;
-                let expr = parse_6(it)?;
+                let expr = parse_5(it)?;
                 Ok((Expression::Func(func, Box::new(expr)), span))
             } else {
                 parse_6(it)
