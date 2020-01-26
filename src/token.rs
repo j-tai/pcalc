@@ -1,10 +1,14 @@
+use num::BigInt;
+
 use crate::{Result, Span};
 
 /// A token.
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Token<'a> {
-    /// A numeric literal.
-    Number(f64),
+    /// An integer literal.
+    Integer(BigInt),
+    /// A floating-point literal.
+    Float(f64),
     /// An identifier.
     Ident(&'a str),
     /// A plus sign `+`.

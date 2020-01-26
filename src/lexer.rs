@@ -24,7 +24,7 @@ struct Lex<'a> {
     file: Option<Rc<String>>,
     line: u32,
     col: u32,
-    peeked: Option<(Token<'a>, Span)>
+    peeked: Option<(Token<'a>, Span)>,
 }
 
 /// Return whether this character is acceptable in an identifier.
@@ -81,10 +81,12 @@ impl<'a> Lex<'a> {
     /// Read a numeric literal.
     fn read_number(&mut self) -> (Token<'a>, Span) {
         let mut end = 0;
+        let mut is_float = false;
         end = self.read_while(end, |c| c.is_digit(10));
         if self.input[end..].chars().next() == Some('.') {
             end = end + 1;
             end = self.read_while(end, |c| c.is_digit(10));
+            is_float = true;
         }
         if let Some('e') | Some('E') = self.input[end..].chars().next() {
             end = end + 1;
@@ -94,12 +96,15 @@ impl<'a> Lex<'a> {
             }
             // Consume exponent
             end = self.read_while(end, |c| c.is_digit(10));
+            is_float = true;
         }
         let s = &self.input[..end];
-        (
-            Token::Number(s.parse().expect("invalid numeric literal")),
-            self.advance_span(end),
-        )
+        let tok = if is_float {
+            Token::Float(s.parse().expect("invalid float literal"))
+        } else {
+            Token::Integer(s.parse().expect("invalid integer literal"))
+        };
+        (tok, self.advance_span(end))
     }
 
     /// Read an identifier.
