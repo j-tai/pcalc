@@ -26,9 +26,10 @@ impl Constant {
     /// Get the value of the constant.
     pub fn value(self) -> Value {
         match self {
-            Constant::Pi => Value::Float(consts::PI),
-            Constant::E => Value::Float(consts::E),
+            Constant::Pi => consts::PI,
+            Constant::E => consts::E,
         }
+        .into()
     }
 }
 
@@ -91,24 +92,23 @@ impl Function {
     /// The context is primarily used to determine the angle with which the
     /// calculation should be performed (i.e., degrees or radians).
     pub fn apply(self, x: Value, ctx: &Context) -> Result<Value, Error> {
-        use Value::Float;
         match self {
             Function::Abs => match x {
-                Value::Float(f) => Ok(Value::Float(f.abs())),
-                Value::Ratio(f) => Ok(Value::Ratio(f.abs())),
+                Value::Float(f) => Ok(f.abs().into()),
+                Value::Ratio(f) => Ok(f.abs().into()),
             },
-            Function::Sin => Ok(Float(ctx.angle.to_rad(x.to_f64()).sin())),
-            Function::Cos => Ok(Float(ctx.angle.to_rad(x.to_f64()).cos())),
-            Function::Tan => Ok(Float(ctx.angle.to_rad(x.to_f64()).tan())),
-            Function::Asin => Ok(Float(ctx.angle.from_rad(x.to_f64().asin()))),
-            Function::Acos => Ok(Float(ctx.angle.from_rad(x.to_f64().acos()))),
-            Function::Atan => Ok(Float(ctx.angle.from_rad(x.to_f64().atan()))),
-            Function::Sinh => Ok(Float(x.to_f64().sinh())),
-            Function::Cosh => Ok(Float(x.to_f64().cosh())),
-            Function::Tanh => Ok(Float(x.to_f64().tanh())),
-            Function::Asinh => Ok(Float(x.to_f64().asinh())),
-            Function::Acosh => Ok(Float(x.to_f64().acosh())),
-            Function::Atanh => Ok(Float(x.to_f64().atanh())),
+            Function::Sin => Ok(ctx.angle.to_rad(x.to_f64()).sin().into()),
+            Function::Cos => Ok(ctx.angle.to_rad(x.to_f64()).cos().into()),
+            Function::Tan => Ok(ctx.angle.to_rad(x.to_f64()).tan().into()),
+            Function::Asin => Ok(ctx.angle.from_rad(x.to_f64().asin()).into()),
+            Function::Acos => Ok(ctx.angle.from_rad(x.to_f64().acos()).into()),
+            Function::Atan => Ok(ctx.angle.from_rad(x.to_f64().atan()).into()),
+            Function::Sinh => Ok(x.to_f64().sinh().into()),
+            Function::Cosh => Ok(x.to_f64().cosh().into()),
+            Function::Tanh => Ok(x.to_f64().tanh().into()),
+            Function::Asinh => Ok(x.to_f64().asinh().into()),
+            Function::Acosh => Ok(x.to_f64().acosh().into()),
+            Function::Atanh => Ok(x.to_f64().atanh().into()),
         }
     }
 }
