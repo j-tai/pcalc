@@ -5,6 +5,8 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+use num::traits::Signed;
+
 use crate::{Context, Error, Value};
 
 #[cfg(test)]
@@ -90,21 +92,23 @@ impl Function {
     /// calculation should be performed (i.e., degrees or radians).
     pub fn apply(self, x: Value, ctx: &Context) -> Result<Value, Error> {
         use Value::Float;
-        let Float(x) = x;
         match self {
-            Function::Abs => Ok(Float(x.abs())),
-            Function::Sin => Ok(Float(ctx.angle.to_rad(x).sin())),
-            Function::Cos => Ok(Float(ctx.angle.to_rad(x).cos())),
-            Function::Tan => Ok(Float(ctx.angle.to_rad(x).tan())),
-            Function::Asin => Ok(Float(ctx.angle.from_rad(x.asin()))),
-            Function::Acos => Ok(Float(ctx.angle.from_rad(x.acos()))),
-            Function::Atan => Ok(Float(ctx.angle.from_rad(x.atan()))),
-            Function::Sinh => Ok(Float(x.sinh())),
-            Function::Cosh => Ok(Float(x.cosh())),
-            Function::Tanh => Ok(Float(x.tanh())),
-            Function::Asinh => Ok(Float(x.asinh())),
-            Function::Acosh => Ok(Float(x.acosh())),
-            Function::Atanh => Ok(Float(x.atanh())),
+            Function::Abs => match x {
+                Value::Float(f) => Ok(Value::Float(f.abs())),
+                Value::Ratio(f) => Ok(Value::Ratio(f.abs())),
+            },
+            Function::Sin => Ok(Float(ctx.angle.to_rad(x.to_f64()).sin())),
+            Function::Cos => Ok(Float(ctx.angle.to_rad(x.to_f64()).cos())),
+            Function::Tan => Ok(Float(ctx.angle.to_rad(x.to_f64()).tan())),
+            Function::Asin => Ok(Float(ctx.angle.from_rad(x.to_f64().asin()))),
+            Function::Acos => Ok(Float(ctx.angle.from_rad(x.to_f64().acos()))),
+            Function::Atan => Ok(Float(ctx.angle.from_rad(x.to_f64().atan()))),
+            Function::Sinh => Ok(Float(x.to_f64().sinh())),
+            Function::Cosh => Ok(Float(x.to_f64().cosh())),
+            Function::Tanh => Ok(Float(x.to_f64().tanh())),
+            Function::Asinh => Ok(Float(x.to_f64().asinh())),
+            Function::Acosh => Ok(Float(x.to_f64().acosh())),
+            Function::Atanh => Ok(Float(x.to_f64().atanh())),
         }
     }
 }

@@ -76,22 +76,33 @@ struct Format<'a> {
 
 impl Display for Format<'_> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        let Value::Float(num) = self.num;
-        let mag = num.abs();
-        if self.ctx.notation_range.0 < mag && mag < self.ctx.notation_range.1 || mag == 0.0 {
-            // Show number normally (no scientific notation) if within the range
-            // or equal to zero
-            write!(f, "{}", num)
-        } else if mag < 1.0 {
-            write!(f, "{:e}", num)
-        } else {
-            // Force '+' on exponent
-            let s = format!("{:e}", num);
-            if let Some(e) = s.find('e') {
-                write!(f, "{}e+{}", &s[..e], &s[(e + 1)..])
-            } else {
-                // No 'e' found -- probably +/- infinity
-                write!(f, "{}", s)
+        match self.num {
+            Value::Ratio(num) => {
+                if num.is_integer() {
+                    write!(f, "{}", num.numer())
+                } else {
+                    write!(f, "{} / {}", num.numer(), num.denom())
+                }
+            }
+            Value::Float(num) => {
+                let mag = num.abs();
+                if self.ctx.notation_range.0 < mag && mag < self.ctx.notation_range.1 || mag == 0.0
+                {
+                    // Show number normally (no scientific notation) if within the range
+                    // or equal to zero
+                    write!(f, "{}", num)
+                } else if mag < 1.0 {
+                    write!(f, "{:e}", num)
+                } else {
+                    // Force '+' on exponent
+                    let s = format!("{:e}", num);
+                    if let Some(e) = s.find('e') {
+                        write!(f, "{}e+{}", &s[..e], &s[(e + 1)..])
+                    } else {
+                        // No 'e' found -- probably +/- infinity
+                        write!(f, "{}", s)
+                    }
+                }
             }
         }
     }
