@@ -89,37 +89,37 @@ fn parse_3<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
     }
 }
 
-/// Parse a fourth-level expression: exponentiation.
+/// Parse a fourth-level expression: functions and prefix unary operators.
 fn parse_4<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
-    let lhs = parse_5(it)?;
-    match it.peek()? {
-        (Token::Exponent, _) => {
-            let (_, span) = it.next()?;
-            // Right associative
-            let rhs = parse_4(it)?;
-            Ok((Expression::Exp(Box::new([lhs, rhs])), span))
-        }
-        _ => Ok(lhs),
-    }
-}
-
-/// Parse a fifth-level expression: functions and prefix unary operators.
-fn parse_5<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
     match it.peek()? {
         (Token::Minus, _) => {
             let (_, span) = it.next()?;
-            Ok((Expression::Neg(Box::new(parse_5(it)?)), span))
+            Ok((Expression::Neg(Box::new(parse_4(it)?)), span))
         }
         (Token::Ident(id), _) => {
             if let Ok(func) = id.parse() {
                 let (_, span) = it.next()?;
-                let expr = parse_5(it)?;
+                let expr = parse_4(it)?;
                 Ok((Expression::Func(func, Box::new(expr)), span))
             } else {
-                parse_6(it)
+                parse_5(it)
             }
         }
-        _ => parse_6(it),
+        _ => parse_5(it),
+    }
+}
+
+/// Parse a fifth-level expression: exponentiation.
+fn parse_5<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
+    let lhs = parse_6(it)?;
+    match it.peek()? {
+        (Token::Exponent, _) => {
+            let (_, span) = it.next()?;
+            // Right associative
+            let rhs = parse_5(it)?;
+            Ok((Expression::Exp(Box::new([lhs, rhs])), span))
+        }
+        _ => Ok(lhs),
     }
 }
 
