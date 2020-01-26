@@ -17,5 +17,7 @@ mod interpreter;
 mod lexer;
 mod parser;
 mod span;
+#[cfg(test)]
+mod tests;
 mod token;
 mod value;
