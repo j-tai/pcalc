@@ -37,9 +37,9 @@ pub enum Expression {
     Comma(Vec<(Expression, Span)>),
 }
 
-impl From<Value> for Expression {
-    fn from(val: Value) -> Expression {
-        Expression::Val(val)
+impl<T: Into<Value>> From<T> for Expression {
+    fn from(val: T) -> Expression {
+        Expression::Val(val.into())
     }
 }
 
