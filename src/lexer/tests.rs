@@ -44,23 +44,20 @@ fn sp(start: u32, end: u32) -> Span {
 
 #[test]
 fn numbers() {
-    assert_eq!(
-        v("1.2345 9876"),
-        vec![Float(1.2345), Integer(9876), Eof]
-    );
+    assert_eq!(v("1.2345 9876"), vec![1.2345.into(), 9876.into(), Eof]);
 }
 
 #[test]
 fn number_with_exponent() {
     assert_eq!(
         v("1.23e4 9876e-4 1e+9"),
-        vec![Float(1.23e4), Float(9876e-4), Float(1e+9), Eof],
+        vec![1.23e4.into(), 9876e-4.into(), 1e+9.into(), Eof],
     );
 }
 
 #[test]
 fn number_missing_digits() {
-    assert_eq!(v(".5 1."), vec![Float(0.5), Float(1.0), Eof]);
+    assert_eq!(v(".5 1."), vec![0.5.into(), 1.0.into(), Eof]);
 }
 
 #[test]
@@ -89,10 +86,7 @@ fn operators_no_space() {
 
 #[test]
 fn excess_spaces() {
-    assert_eq!(
-        v("   3 +5  "),
-        vec![Integer(3), Plus, Integer(5), Eof],
-    );
+    assert_eq!(v("   3 +5  "), vec![3.into(), Plus, 5.into(), Eof]);
 }
 
 #[test]
@@ -119,16 +113,16 @@ fn span() {
 #[test]
 fn peek() {
     let mut l = lex("1 2 3 4 5", None);
-    assert_eq!(l.peek(), Ok(&(Integer(1), sp(1, 1))));
-    assert_eq!(l.peek(), Ok(&(Integer(1), sp(1, 1))));
-    assert_eq!(l.next(), Ok((Integer(1), sp(1, 1))));
-    assert_eq!(l.next(), Ok((Integer(2), sp(3, 3))));
-    assert_eq!(l.peek(), Ok(&(Integer(3), sp(5, 5))));
-    assert_eq!(l.peek(), Ok(&(Integer(3), sp(5, 5))));
-    assert_eq!(l.next(), Ok((Integer(3), sp(5, 5))));
-    assert_eq!(l.peek(), Ok(&(Integer(4), sp(7, 7))));
-    assert_eq!(l.next(), Ok((Integer(4), sp(7, 7))));
-    assert_eq!(l.next(), Ok((Integer(5), sp(9, 9))));
+    assert_eq!(l.peek(), Ok(&(1.into(), sp(1, 1))));
+    assert_eq!(l.peek(), Ok(&(1.into(), sp(1, 1))));
+    assert_eq!(l.next(), Ok((1.into(), sp(1, 1))));
+    assert_eq!(l.next(), Ok((2.into(), sp(3, 3))));
+    assert_eq!(l.peek(), Ok(&(3.into(), sp(5, 5))));
+    assert_eq!(l.peek(), Ok(&(3.into(), sp(5, 5))));
+    assert_eq!(l.next(), Ok((3.into(), sp(5, 5))));
+    assert_eq!(l.peek(), Ok(&(4.into(), sp(7, 7))));
+    assert_eq!(l.next(), Ok((4.into(), sp(7, 7))));
+    assert_eq!(l.next(), Ok((5.into(), sp(9, 9))));
     assert_eq!(l.peek(), Ok(&(Eof, sp(10, 10))));
     assert_eq!(l.peek(), Ok(&(Eof, sp(10, 10))));
     assert_eq!(l.next(), Ok((Eof, sp(10, 10))));

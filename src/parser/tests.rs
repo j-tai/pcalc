@@ -2,7 +2,6 @@ use std::iter::Peekable;
 
 use crate::Expression::*;
 use crate::Token::*;
-use crate::Value::{Float as VFloat, Ratio};
 use crate::{parse, Constant, Error, Expression, Function, Result, Span, Token, TokenStream};
 
 fn sp() -> Span {
@@ -50,41 +49,38 @@ fn tok2<'a>(tokens: Vec<(Token<'a>, Span)>) -> impl TokenStream<'a> {
 
 #[test]
 fn num() {
-    let tokens = vec![Float(2.5), Eof];
-    assert_eq!(parse(tok(tokens)), Ok((Val(VFloat(2.5)), sp())));
+    let tokens = vec![2.5.into(), Eof];
+    assert_eq!(parse(tok(tokens)), Ok((2.5.into(), sp())));
 }
 
 #[test]
 fn int() {
-    let tokens = vec![Integer(64), Eof];
-    assert_eq!(parse(tok(tokens)), Ok((Val(Ratio(64.into())), sp())));
+    let tokens = vec![64.into(), Eof];
+    assert_eq!(parse(tok(tokens)), Ok((64.into(), sp())));
 }
 
 #[test]
 fn paren() {
-    let tokens = vec![LeftParen, Float(2.5), RightParen, Eof];
-    assert_eq!(parse(tok(tokens)), Ok((Val(VFloat(2.5)), sp())));
+    let tokens = vec![LeftParen, 2.5.into(), RightParen, Eof];
+    assert_eq!(parse(tok(tokens)), Ok((2.5.into(), sp())));
 }
 
 #[test]
 fn neg() {
-    let tokens = vec![Minus, Float(2.5), Eof];
+    let tokens = vec![Minus, 2.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
-        Ok((Neg(Box::new((Val(VFloat(2.5)), sp()))), sp())),
+        Ok((Neg(Box::new((2.5.into(), sp()))), sp())),
     );
 }
 
 #[test]
 fn exp() {
-    let tokens = vec![Float(2.5), Exponent, Float(1.5), Eof];
+    let tokens = vec![2.5.into(), Exponent, 1.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
-            Exp(Box::new([
-                (Val(VFloat(2.5)), sp()),
-                (Val(VFloat(1.5)), sp())
-            ])),
+            Exp(Box::new([(2.5.into(), sp()), (1.5.into(), sp())])),
             sp()
         )),
     );
@@ -92,17 +88,14 @@ fn exp() {
 
 #[test]
 fn exp_multiple() {
-    let tokens = vec![Float(2.5), Exponent, Float(1.5), Exponent, Float(0.5), Eof];
+    let tokens = vec![2.5.into(), Exponent, 1.5.into(), Exponent, 0.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Exp(Box::new([
-                (Val(VFloat(2.5)), sp()),
+                (2.5.into(), sp()),
                 (
-                    Exp(Box::new([
-                        (Val(VFloat(1.5)), sp()),
-                        (Val(VFloat(0.5)), sp())
-                    ])),
+                    Exp(Box::new([(1.5.into(), sp()), (0.5.into(), sp())])),
                     sp()
                 ),
             ])),
@@ -113,36 +106,33 @@ fn exp_multiple() {
 
 #[test]
 fn mul() {
-    let tokens = vec![Float(2.5), Times, Float(1.5), Eof];
+    let tokens = vec![2.5.into(), Times, 1.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
-        Ok((
-            Mul(vec![(Val(VFloat(2.5)), sp()), (Val(VFloat(1.5)), sp())]),
-            sp()
-        )),
+        Ok((Mul(vec![(2.5.into(), sp()), (1.5.into(), sp())]), sp())),
     );
 }
 
 #[test]
 fn mul_multiple() {
     let tokens = vec![
-        Float(2.5),
+        2.5.into(),
         Times,
-        Float(1.5),
+        1.5.into(),
         Times,
-        Float(0.5),
+        0.5.into(),
         Times,
-        Float(1.23),
+        1.23.into(),
         Eof,
     ];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Mul(vec![
-                (Val(VFloat(2.5)), sp()),
-                (Val(VFloat(1.5)), sp()),
-                (Val(VFloat(0.5)), sp()),
-                (Val(VFloat(1.23)), sp()),
+                (2.5.into(), sp()),
+                (1.5.into(), sp()),
+                (0.5.into(), sp()),
+                (1.23.into(), sp()),
             ]),
             sp(),
         )),
@@ -151,14 +141,11 @@ fn mul_multiple() {
 
 #[test]
 fn frac() {
-    let tokens = vec![Float(2.5), Divide, Float(1.5), Eof];
+    let tokens = vec![2.5.into(), Divide, 1.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
-            Frac(Box::new([
-                (Val(VFloat(2.5)), sp()),
-                (Val(VFloat(1.5)), sp())
-            ])),
+            Frac(Box::new([(2.5.into(), sp()), (1.5.into(), sp())])),
             sp()
         )),
     );
@@ -167,13 +154,13 @@ fn frac() {
 #[test]
 fn frac_multiple() {
     let tokens = vec![
-        Float(2.5),
+        2.5.into(),
         Divide,
-        Float(1.5),
+        1.5.into(),
         Divide,
-        Float(0.5),
+        0.5.into(),
         Divide,
-        Float(1.23),
+        1.23.into(),
         Eof,
     ];
     assert_eq!(
@@ -183,17 +170,14 @@ fn frac_multiple() {
                 (
                     Frac(Box::new([
                         (
-                            Frac(Box::new([
-                                (Val(VFloat(2.5)), sp()),
-                                (Val(VFloat(1.5)), sp())
-                            ])),
+                            Frac(Box::new([(2.5.into(), sp()), (1.5.into(), sp())])),
                             sp()
                         ),
-                        (Val(VFloat(0.5)), sp()),
+                        (0.5.into(), sp()),
                     ])),
                     sp(),
                 ),
-                (Val(VFloat(1.23)), sp()),
+                (1.23.into(), sp()),
             ])),
             sp(),
         )),
@@ -202,36 +186,33 @@ fn frac_multiple() {
 
 #[test]
 fn add() {
-    let tokens = vec![Float(2.5), Plus, Float(1.5), Eof];
+    let tokens = vec![2.5.into(), Plus, 1.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
-        Ok((
-            Add(vec![(Val(VFloat(2.5)), sp()), (Val(VFloat(1.5)), sp())]),
-            sp()
-        )),
+        Ok((Add(vec![(2.5.into(), sp()), (1.5.into(), sp())]), sp())),
     );
 }
 
 #[test]
 fn add_multiple() {
     let tokens = vec![
-        Float(2.5),
+        2.5.into(),
         Plus,
-        Float(1.5),
+        1.5.into(),
         Plus,
-        Float(0.5),
+        0.5.into(),
         Plus,
-        Float(1.23),
+        1.23.into(),
         Eof,
     ];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Add(vec![
-                (Val(VFloat(2.5)), sp()),
-                (Val(VFloat(1.5)), sp()),
-                (Val(VFloat(0.5)), sp()),
-                (Val(VFloat(1.23)), sp()),
+                (2.5.into(), sp()),
+                (1.5.into(), sp()),
+                (0.5.into(), sp()),
+                (1.23.into(), sp()),
             ]),
             sp(),
         )),
@@ -240,14 +221,11 @@ fn add_multiple() {
 
 #[test]
 fn sub() {
-    let tokens = vec![Float(2.5), Minus, Float(1.5), Eof];
+    let tokens = vec![2.5.into(), Minus, 1.5.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
-            Sub(Box::new([
-                (Val(VFloat(2.5)), sp()),
-                (Val(VFloat(1.5)), sp())
-            ])),
+            Sub(Box::new([(2.5.into(), sp()), (1.5.into(), sp())])),
             sp()
         )),
     );
@@ -256,13 +234,13 @@ fn sub() {
 #[test]
 fn sub_multiple() {
     let tokens = vec![
-        Float(2.5),
+        2.5.into(),
         Minus,
-        Float(1.5),
+        1.5.into(),
         Minus,
-        Float(0.5),
+        0.5.into(),
         Minus,
-        Float(1.23),
+        1.23.into(),
         Eof,
     ];
     assert_eq!(
@@ -272,17 +250,14 @@ fn sub_multiple() {
                 (
                     Sub(Box::new([
                         (
-                            Sub(Box::new([
-                                (Val(VFloat(2.5)), sp()),
-                                (Val(VFloat(1.5)), sp())
-                            ])),
+                            Sub(Box::new([(2.5.into(), sp()), (1.5.into(), sp())])),
                             sp()
                         ),
-                        (Val(VFloat(0.5)), sp()),
+                        (0.5.into(), sp()),
                     ])),
                     sp(),
                 ),
-                (Val(VFloat(1.23)), sp()),
+                (1.23.into(), sp()),
             ])),
             sp(),
         )),
@@ -292,25 +267,22 @@ fn sub_multiple() {
 #[test]
 fn nested() {
     let tokens = vec![
-        Float(1.0),
+        1.0.into(),
         Plus,
-        Float(2.0),
+        2.0.into(),
         Times,
-        Float(3.0),
+        3.0.into(),
         Plus,
-        Float(4.0),
+        4.0.into(),
         Eof,
     ];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Add(vec![
-                (Val(VFloat(1.0)), sp()),
-                (
-                    Mul(vec![(Val(VFloat(2.0)), sp()), (Val(VFloat(3.0)), sp())]),
-                    sp()
-                ),
-                (Val(VFloat(4.0)), sp()),
+                (1.0.into(), sp()),
+                (Mul(vec![(2.0.into(), sp()), (3.0.into(), sp())]), sp()),
+                (4.0.into(), sp()),
             ]),
             sp(),
         )),
@@ -320,27 +292,24 @@ fn nested() {
 #[test]
 fn nested_paren() {
     let tokens = vec![
-        Float(1.0),
+        1.0.into(),
         Times,
         LeftParen,
-        Float(2.0),
+        2.0.into(),
         Plus,
-        Float(3.0),
+        3.0.into(),
         RightParen,
         Times,
-        Float(4.0),
+        4.0.into(),
         Eof,
     ];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Mul(vec![
-                (Val(VFloat(1.0)), sp()),
-                (
-                    Add(vec![(Val(VFloat(2.0)), sp()), (Val(VFloat(3.0)), sp())]),
-                    sp()
-                ),
-                (Val(VFloat(4.0)), sp()),
+                (1.0.into(), sp()),
+                (Add(vec![(2.0.into(), sp()), (3.0.into(), sp())]), sp()),
+                (4.0.into(), sp()),
             ]),
             sp(),
         )),
@@ -366,13 +335,13 @@ fn constants() {
 fn functions() {
     let tokens = vec![
         Ident("sin"),
-        Float(12.34),
+        12.34.into(),
         Plus,
         Ident("atan"),
         LeftParen,
-        Float(5.6),
+        5.6.into(),
         Minus,
-        Float(5.7),
+        5.7.into(),
         RightParen,
         Eof,
     ];
@@ -380,18 +349,12 @@ fn functions() {
         parse(tok(tokens)),
         Ok((
             Add(vec![
-                (
-                    Func(Function::Sin, Box::new((Val(VFloat(12.34)), sp()))),
-                    sp()
-                ),
+                (Func(Function::Sin, Box::new((12.34.into(), sp()))), sp()),
                 (
                     Func(
                         Function::Atan,
                         Box::new((
-                            Sub(Box::new([
-                                (Val(VFloat(5.6)), sp()),
-                                (Val(VFloat(5.7)), sp())
-                            ])),
+                            Sub(Box::new([(5.6.into(), sp()), (5.7.into(), sp())])),
                             sp()
                         )),
                     ),
@@ -428,16 +391,13 @@ fn var() {
 
 #[test]
 fn r#let() {
-    let tokens = vec![Ident("x"), Equals, Float(2.0), Plus, Float(2.0), Eof];
+    let tokens = vec![Ident("x"), Equals, 2.0.into(), Plus, 2.0.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Let(
                 "x".to_string(),
-                Box::new((
-                    Add(vec![(Val(VFloat(2.0)), sp()), (Val(VFloat(2.0)), sp())]),
-                    sp()
-                )),
+                Box::new((Add(vec![(2.0.into(), sp()), (2.0.into(), sp())]), sp())),
             ),
             sp(),
         )),
@@ -447,20 +407,20 @@ fn r#let() {
 #[test]
 fn comma() {
     let tokens = vec![
-        Float(1.0),
+        1.0.into(),
         Token::Comma,
-        Float(2.0),
+        2.0.into(),
         Token::Comma,
-        Float(3.0),
+        3.0.into(),
         Eof,
     ];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Expression::Comma(vec![
-                (Val(VFloat(1.0)), sp()),
-                (Val(VFloat(2.0)), sp()),
-                (Val(VFloat(3.0)), sp())
+                (1.0.into(), sp()),
+                (2.0.into(), sp()),
+                (3.0.into(), sp())
             ]),
             sp(),
         )),
@@ -470,11 +430,11 @@ fn comma() {
 #[test]
 fn span() {
     let tokens = vec![
-        (Float(1.0), spa(1, 1)),
+        (1.0.into(), spa(1, 1)),
         (Exponent, spa(2, 2)),
-        (Float(2.0), spa(3, 3)),
+        (2.0.into(), spa(3, 3)),
         (Plus, spa(4, 4)),
-        (Float(3.0), spa(5, 5)),
+        (3.0.into(), spa(5, 5)),
         (Eof, spa(6, 6)),
     ];
     assert_eq!(
@@ -482,13 +442,10 @@ fn span() {
         Ok((
             Add(vec![
                 (
-                    Exp(Box::new([
-                        (Val(VFloat(1.0)), spa(1, 1)),
-                        (Val(VFloat(2.0)), spa(3, 3))
-                    ])),
+                    Exp(Box::new([(1.0.into(), spa(1, 1)), (2.0.into(), spa(3, 3))])),
                     spa(2, 2),
                 ),
-                (Val(VFloat(3.0)), spa(5, 5)),
+                (3.0.into(), spa(5, 5)),
             ]),
             spa(4, 4),
         )),
@@ -498,10 +455,10 @@ fn span() {
 #[test]
 fn err_span() {
     let tokens = vec![
-        (Float(1.0), spa(1, 1)),
+        (1.0.into(), spa(1, 1)),
         (Exponent, spa(2, 2)),
         (Exponent, spa(3, 3)),
-        (Float(1.0), spa(4, 4)),
+        (1.0.into(), spa(4, 4)),
         (Eof, spa(6, 6)),
     ];
     assert_eq!(parse(tok2(tokens)), Err((Error::Syntax, spa(3, 3))));
@@ -509,13 +466,13 @@ fn err_span() {
 
 #[test]
 fn func_neg() {
-    let tokens = vec![Ident("sin"), Minus, Float(1.0), Eof];
+    let tokens = vec![Ident("sin"), Minus, 1.0.into(), Eof];
     assert_eq!(
         parse(tok(tokens)),
         Ok((
             Func(
                 Function::Sin,
-                Box::new((Neg(Box::new((Val(VFloat(1.0)), sp()))), sp())),
+                Box::new((Neg(Box::new((1.0.into(), sp()))), sp())),
             ),
             sp(),
         )),

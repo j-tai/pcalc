@@ -1,7 +1,6 @@
 use std::f64::consts;
 
 use crate::Expression::*;
-use crate::Value::*;
 use crate::{eval, Constant, Context, Span};
 
 fn sp() -> Span {
@@ -19,127 +18,127 @@ fn ctx() -> Context {
 
 #[test]
 fn num() {
-    let x = (Val(Float(4.2)), sp());
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(4.2)));
-    let x = (Val(Float(42.185)), sp());
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(42.185)));
+    let x = (4.2.into(), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(4.2.into()));
+    let x = (42.185.into(), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(42.185.into()));
 }
 
 #[test]
 fn add() {
     let x = (
-        Add(vec![(Val(Float(5.0)), sp()), (Val(Float(3.0)), sp())]),
+        Add(vec![(5.0.into(), sp()), (3.0.into(), sp())]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(8.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(8.0.into()));
     let x = (
         Add(vec![
-            (Val(Float(0.0)), sp()),
-            (Val(Float(1.0)), sp()),
-            (Val(Float(2.0)), sp()),
-            (Val(Float(3.0)), sp()),
+            (0.0.into(), sp()),
+            (1.0.into(), sp()),
+            (2.0.into(), sp()),
+            (3.0.into(), sp()),
         ]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(6.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(6.0.into()));
 }
 
 #[test]
 fn sub() {
     let x = (
-        Sub(Box::new([(Val(Float(5.0)), sp()), (Val(Float(3.0)), sp())])),
+        Sub(Box::new([(5.0.into(), sp()), (3.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(2.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
 }
 
 #[test]
 fn mul() {
     let x = (
-        Mul(vec![(Val(Float(5.0)), sp()), (Val(Float(3.0)), sp())]),
+        Mul(vec![(5.0.into(), sp()), (3.0.into(), sp())]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(15.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(15.0.into()));
     let x = (
         Mul(vec![
-            (Val(Float(1.0)), sp()),
-            (Val(Float(2.0)), sp()),
-            (Val(Float(3.0)), sp()),
-            (Val(Float(4.0)), sp()),
+            (1.0.into(), sp()),
+            (2.0.into(), sp()),
+            (3.0.into(), sp()),
+            (4.0.into(), sp()),
         ]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(24.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(24.0.into()));
 }
 
 #[test]
 fn frac() {
     let x = (
-        Frac(Box::new([(Val(Float(5.0)), sp()), (Val(Float(2.0)), sp())])),
+        Frac(Box::new([(5.0.into(), sp()), (2.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(2.5)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(2.5.into()));
 }
 
 #[test]
 fn exp() {
     let x = (
-        Exp(Box::new([(Val(Float(3.0)), sp()), (Val(Float(2.0)), sp())])),
+        Exp(Box::new([(3.0.into(), sp()), (2.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(9.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(9.0.into()));
     let x = (
-        Exp(Box::new([(Val(Float(2.0)), sp()), (Val(Float(3.0)), sp())])),
+        Exp(Box::new([(2.0.into(), sp()), (3.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(8.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(8.0.into()));
 }
 
 #[test]
 fn root() {
     let x = (
-        Root(Box::new([(Val(Float(9.0)), sp()), (Val(Float(2.0)), sp())])),
+        Root(Box::new([(9.0.into(), sp()), (2.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(3.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
     let x = (
-        Root(Box::new([(Val(Float(8.0)), sp()), (Val(Float(3.0)), sp())])),
+        Root(Box::new([(8.0.into(), sp()), (3.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(2.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
 }
 
 #[test]
 fn log() {
     let x = (
-        Log(Box::new([(Val(Float(9.0)), sp()), (Val(Float(3.0)), sp())])),
+        Log(Box::new([(9.0.into(), sp()), (3.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(2.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
     let x = (
-        Log(Box::new([(Val(Float(8.0)), sp()), (Val(Float(2.0)), sp())])),
+        Log(Box::new([(8.0.into(), sp()), (2.0.into(), sp())])),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(3.0)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
 }
 
 #[test]
 fn const_pi() {
     let x = (Const(Constant::Pi), sp());
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(consts::PI)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(consts::PI.into()));
 }
 
 #[test]
 fn const_e() {
     let x = (Const(Constant::E), sp());
-    assert_eq!(eval(&x, &mut ctx()), Ok(Float(consts::E)));
+    assert_eq!(eval(&x, &mut ctx()), Ok(consts::E.into()));
 }
 
 #[test]
 fn var() {
     let mut ctx = ctx();
-    ctx.vars.insert("x".to_string(), Float(1.5));
-    ctx.vars.insert("foo".to_string(), Float(2.5));
+    ctx.vars.insert("x".to_string(), 1.5.into());
+    ctx.vars.insert("foo".to_string(), 2.5.into());
     let x = (
         Add(vec![
             (Var("x".to_string()), sp()),
@@ -147,18 +146,18 @@ fn var() {
         ]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx), Ok(Float(4.0)));
+    assert_eq!(eval(&x, &mut ctx), Ok(4.0.into()));
 }
 
 #[test]
 fn r#let() {
     let mut ctx = ctx();
     let x = (
-        Let("foo".to_string(), Box::new((Val(Float(2.5)), sp()))),
+        Let("foo".to_string(), Box::new((2.5.into(), sp()))),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx), Ok(Float(2.5)));
-    assert_eq!(ctx.vars.get("foo"), Some(&Float(2.5)));
+    assert_eq!(eval(&x, &mut ctx), Ok(2.5.into()));
+    assert_eq!(ctx.vars.get("foo"), Some(&2.5.into()));
 }
 
 #[test]
@@ -166,11 +165,11 @@ fn comma() {
     let mut ctx = ctx();
     let x = (
         Comma(vec![
-            (Val(Float(1.0)), sp()),
-            (Val(Float(2.0)), sp()),
-            (Val(Float(3.0)), sp()),
+            (1.0.into(), sp()),
+            (2.0.into(), sp()),
+            (3.0.into(), sp()),
         ]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx), Ok(Float(3.0)));
+    assert_eq!(eval(&x, &mut ctx), Ok(3.0.into()));
 }
