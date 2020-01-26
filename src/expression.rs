@@ -36,3 +36,21 @@ pub enum Expression {
     /// Multiple expressions delimited by commas.
     Comma(Vec<(Expression, Span)>),
 }
+
+impl From<Value> for Expression {
+    fn from(val: Value) -> Expression {
+        Expression::Val(val)
+    }
+}
+
+impl From<Constant> for Expression {
+    fn from(con: Constant) -> Expression {
+        Expression::Const(con)
+    }
+}
+
+impl From<(Function, Box<(Expression, Span)>)> for Expression {
+    fn from((f, expr): (Function, Box<(Expression, Span)>)) -> Expression {
+        Expression::Func(f, expr)
+    }
+}

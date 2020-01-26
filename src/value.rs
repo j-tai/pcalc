@@ -21,3 +21,21 @@ impl Value {
         }
     }
 }
+
+impl From<i64> for Value {
+    fn from(val: i64) -> Value {
+        Value::Ratio(val.into())
+    }
+}
+
+impl From<Ratio<i64>> for Value {
+    fn from(val: Ratio<i64>) -> Value {
+        Value::Ratio(val)
+    }
+}
+
+impl From<f64> for Value {
+    fn from(val: f64) -> Value {
+        Value::Float(val.into())
+    }
+}
