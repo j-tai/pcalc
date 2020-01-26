@@ -22,14 +22,13 @@ fn num() {
     assert_eq!(eval(&x, &mut ctx()), Ok(4.2.into()));
     let x = (42.185.into(), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok(42.185.into()));
+    let x = (55.into(), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(55.into()));
 }
 
 #[test]
 fn add() {
-    let x = (
-        Add(vec![(5.0.into(), sp()), (3.0.into(), sp())]),
-        sp(),
-    );
+    let x = (Add(vec![(5.0.into(), sp()), (3.0.into(), sp())]), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok(8.0.into()));
     let x = (
         Add(vec![
@@ -41,6 +40,8 @@ fn add() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(6.0.into()));
+    let x = (Add(vec![(3.into(), sp()), (5.into(), sp())]), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(8.into()));
 }
 
 #[test]
@@ -50,14 +51,13 @@ fn sub() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
+    let x = (Sub(Box::new([(5.into(), sp()), (3.into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(2.into()));
 }
 
 #[test]
 fn mul() {
-    let x = (
-        Mul(vec![(5.0.into(), sp()), (3.0.into(), sp())]),
-        sp(),
-    );
+    let x = (Mul(vec![(5.0.into(), sp()), (3.0.into(), sp())]), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok(15.0.into()));
     let x = (
         Mul(vec![
@@ -69,6 +69,8 @@ fn mul() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(24.0.into()));
+    let x = (Mul(vec![(5.into(), sp()), (3.into(), sp())]), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(15.into()));
 }
 
 #[test]
@@ -78,6 +80,8 @@ fn frac() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(2.5.into()));
+    let x = (Frac(Box::new([(5.into(), sp()), (2.into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((5, 2).into()));
 }
 
 #[test]
@@ -92,6 +96,8 @@ fn exp() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(8.0.into()));
+    let x = (Exp(Box::new([(2.into(), sp()), (3.into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(8.into()));
 }
 
 #[test]
@@ -106,6 +112,15 @@ fn root() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
+    // 8 root 3 == 2.0
+    let x = (Root(Box::new([(8.into(), sp()), (3.into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
+    // 8 root (1/2) = 64 (not 64.0)
+    let x = (
+        Root(Box::new([(8.into(), sp()), ((1, 2).into(), sp())])),
+        sp(),
+    );
+    assert_eq!(eval(&x, &mut ctx()), Ok(64.into()));
 }
 
 #[test]
@@ -117,6 +132,11 @@ fn log() {
     assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
     let x = (
         Log(Box::new([(8.0.into(), sp()), (2.0.into(), sp())])),
+        sp(),
+    );
+    assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
+    let x = (
+        Log(Box::new([(8.into(), sp()), (2.into(), sp())])),
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
@@ -138,7 +158,7 @@ fn const_e() {
 fn var() {
     let mut ctx = ctx();
     ctx.vars.insert("x".to_string(), 1.5.into());
-    ctx.vars.insert("foo".to_string(), 2.5.into());
+    ctx.vars.insert("foo".to_string(), 2.into());
     let x = (
         Add(vec![
             (Var("x".to_string()), sp()),
@@ -146,16 +166,13 @@ fn var() {
         ]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx), Ok(4.0.into()));
+    assert_eq!(eval(&x, &mut ctx), Ok(3.5.into()));
 }
 
 #[test]
 fn r#let() {
     let mut ctx = ctx();
-    let x = (
-        Let("foo".to_string(), Box::new((2.5.into(), sp()))),
-        sp(),
-    );
+    let x = (Let("foo".to_string(), Box::new((2.5.into(), sp()))), sp());
     assert_eq!(eval(&x, &mut ctx), Ok(2.5.into()));
     assert_eq!(ctx.vars.get("foo"), Some(&2.5.into()));
 }
@@ -166,7 +183,7 @@ fn comma() {
     let x = (
         Comma(vec![
             (1.0.into(), sp()),
-            (2.0.into(), sp()),
+            (2.into(), sp()),
             (3.0.into(), sp()),
         ]),
         sp(),
