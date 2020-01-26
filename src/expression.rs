@@ -1,10 +1,10 @@
-use crate::{Constant, Function, Span};
+use crate::{Constant, Function, Span, Value};
 
 /// An abstract syntax tree for a mathematical expression.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expression {
     /// A constant.
-    Num(f64),
+    Val(Value),
     /// Negation of an expression.
     Neg(Box<(Expression, Span)>),
 

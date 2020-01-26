@@ -1,6 +1,6 @@
 //! Parse a string into an AST.
 
-use crate::{Error, Expression, Result, Span, Token, TokenStream};
+use crate::{Error, Expression, Result, Span, Token, TokenStream, Value};
 
 #[cfg(test)]
 mod tests;
@@ -136,7 +136,7 @@ fn parse_6<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
                 Ok(expr)
             }
         }
-        Token::Number(n) => Ok((Expression::Num(n), span)),
+        Token::Number(n) => Ok((Expression::Val(Value::Float(n)), span)),
         Token::Ident(id) => {
             if let Ok(con) = id.parse() {
                 Ok((Expression::Const(con), span))
