@@ -32,108 +32,144 @@ fn deg() -> Context {
 
 #[test]
 fn abs() {
-    assert_eq!(Abs.apply(Float(-1.6), &rad()), Ok(Float(1.6)));
-    assert_eq!(Abs.apply(Float(3.1), &rad()), Ok(Float(3.1)));
+    assert_eq!(Abs.apply((-1.6).into(), &rad()), Ok(1.6.into()));
+    assert_eq!(Abs.apply(3.1.into(), &rad()), Ok(3.1.into()));
 }
 
 // Trig functions in radians mode
 
 #[test]
 fn sin() {
-    assert_eq!(Sin.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.sin())));
+    assert_eq!(Sin.apply(0.31.into(), &rad()), Ok(0.31_f64.sin().into()));
 }
 
 #[test]
 fn cos() {
-    assert_eq!(Cos.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.cos())));
+    assert_eq!(Cos.apply(0.31.into(), &rad()), Ok(0.31_f64.cos().into()));
 }
 
 #[test]
 fn tan() {
-    assert_eq!(Tan.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.tan())));
+    assert_eq!(Tan.apply(0.31.into(), &rad()), Ok(0.31_f64.tan().into()));
 }
 
 #[test]
 fn asin() {
-    assert_eq!(Asin.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.asin())));
+    assert_eq!(Asin.apply(0.31.into(), &rad()), Ok(0.31_f64.asin().into()));
 }
 
 #[test]
 fn acos() {
-    assert_eq!(Acos.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.acos())));
+    assert_eq!(Acos.apply(0.31.into(), &rad()), Ok(0.31_f64.acos().into()));
 }
 
 #[test]
 fn atan() {
-    assert_eq!(Atan.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.atan())));
+    assert_eq!(Atan.apply(0.31.into(), &rad()), Ok(0.31_f64.atan().into()));
 }
 
 // Trig functions in degrees
 
 #[test]
 fn sin_deg() {
-    assert_eq!(Sin.apply(Float(31.0), &deg()), Ok(Float(31.0_f64.to_radians().sin())));
+    assert_eq!(
+        Sin.apply(31.0.into(), &deg()),
+        Ok(31.0_f64.to_radians().sin().into())
+    );
 }
 
 #[test]
 fn cos_deg() {
-    assert_eq!(Cos.apply(Float(31.0), &deg()), Ok(Float(31.0_f64.to_radians().cos())));
+    assert_eq!(
+        Cos.apply(31.0.into(), &deg()),
+        Ok(31.0_f64.to_radians().cos().into())
+    );
 }
 
 #[test]
 fn tan_deg() {
-    assert_eq!(Tan.apply(Float(31.0), &deg()), Ok(Float(31.0_f64.to_radians().tan())));
+    assert_eq!(
+        Tan.apply(31.0.into(), &deg()),
+        Ok(31.0_f64.to_radians().tan().into())
+    );
 }
 
 #[test]
 fn asin_deg() {
-    assert_eq!(Asin.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.asin().to_degrees())));
+    assert_eq!(
+        Asin.apply(0.31.into(), &deg()),
+        Ok(0.31_f64.asin().to_degrees().into())
+    );
 }
 
 #[test]
 fn acos_deg() {
-    assert_eq!(Acos.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.acos().to_degrees())));
+    assert_eq!(
+        Acos.apply(0.31.into(), &deg()),
+        Ok(0.31_f64.acos().to_degrees().into())
+    );
 }
 
 #[test]
 fn atan_deg() {
-    assert_eq!(Atan.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.atan().to_degrees())));
+    assert_eq!(
+        Atan.apply(0.31.into(), &deg()),
+        Ok(0.31_f64.atan().to_degrees().into())
+    );
 }
 
 // Hyperbolic functions
 
 #[test]
 fn sinh() {
-    assert_eq!(Sinh.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.sinh())));
-    assert_eq!(Sinh.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.sinh())));
+    assert_eq!(Sinh.apply(0.31.into(), &rad()), Ok(0.31_f64.sinh().into()));
+    assert_eq!(Sinh.apply(0.31.into(), &deg()), Ok(0.31_f64.sinh().into()));
 }
 
 #[test]
 fn cosh() {
-    assert_eq!(Cosh.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.cosh())));
-    assert_eq!(Cosh.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.cosh())));
+    assert_eq!(Cosh.apply(0.31.into(), &rad()), Ok(0.31_f64.cosh().into()));
+    assert_eq!(Cosh.apply(0.31.into(), &deg()), Ok(0.31_f64.cosh().into()));
 }
 
 #[test]
 fn tanh() {
-    assert_eq!(Tanh.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.tanh())));
-    assert_eq!(Tanh.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.tanh())));
+    assert_eq!(Tanh.apply(0.31.into(), &rad()), Ok(0.31_f64.tanh().into()));
+    assert_eq!(Tanh.apply(0.31.into(), &deg()), Ok(0.31_f64.tanh().into()));
 }
 
 #[test]
 fn asinh() {
-    assert_eq!(Asinh.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.asinh())));
-    assert_eq!(Asinh.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.asinh())));
+    assert_eq!(
+        Asinh.apply(0.31.into(), &rad()),
+        Ok(0.31_f64.asinh().into())
+    );
+    assert_eq!(
+        Asinh.apply(0.31.into(), &deg()),
+        Ok(0.31_f64.asinh().into())
+    );
 }
 
 #[test]
 fn acosh() {
-    assert_eq!(Acosh.apply(Float(1.23), &rad()), Ok(Float(1.23_f64.acosh())));
-    assert_eq!(Acosh.apply(Float(1.23), &deg()), Ok(Float(1.23_f64.acosh())));
+    assert_eq!(
+        Acosh.apply(1.23.into(), &rad()),
+        Ok(1.23_f64.acosh().into())
+    );
+    assert_eq!(
+        Acosh.apply(1.23.into(), &deg()),
+        Ok(1.23_f64.acosh().into())
+    );
 }
 
 #[test]
 fn atanh() {
-    assert_eq!(Atanh.apply(Float(0.31), &rad()), Ok(Float(0.31_f64.atanh())));
-    assert_eq!(Atanh.apply(Float(0.31), &deg()), Ok(Float(0.31_f64.atanh())));
+    assert_eq!(
+        Atanh.apply(0.31.into(), &rad()),
+        Ok(0.31_f64.atanh().into())
+    );
+    assert_eq!(
+        Atanh.apply(0.31.into(), &deg()),
+        Ok(0.31_f64.atanh().into())
+    );
 }
