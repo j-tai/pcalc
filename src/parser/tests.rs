@@ -2,7 +2,7 @@ use std::iter::Peekable;
 
 use crate::Expression::*;
 use crate::Token::*;
-use crate::Value::Float as VFloat;
+use crate::Value::{Float as VFloat, Ratio};
 use crate::{parse, Constant, Error, Expression, Function, Result, Span, Token, TokenStream};
 
 fn sp() -> Span {
@@ -52,6 +52,12 @@ fn tok2<'a>(tokens: Vec<(Token<'a>, Span)>) -> impl TokenStream<'a> {
 fn num() {
     let tokens = vec![Float(2.5), Eof];
     assert_eq!(parse(tok(tokens)), Ok((Val(VFloat(2.5)), sp())));
+}
+
+#[test]
+fn int() {
+    let tokens = vec![Integer(64), Eof];
+    assert_eq!(parse(tok(tokens)), Ok((Val(Ratio(64.into())), sp())));
 }
 
 #[test]

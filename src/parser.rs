@@ -136,7 +136,7 @@ fn parse_6<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
                 Ok(expr)
             }
         }
-        Token::Integer(_) => todo!(),
+        Token::Integer(i) => Ok((Expression::Val(Value::Ratio((i as i64).into())), span)),
         Token::Float(n) => Ok((Expression::Val(Value::Float(n)), span)),
         Token::Ident(id) => {
             if let Ok(con) = id.parse() {

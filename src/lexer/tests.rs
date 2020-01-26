@@ -46,7 +46,7 @@ fn sp(start: u32, end: u32) -> Span {
 fn numbers() {
     assert_eq!(
         v("1.2345 9876"),
-        vec![Float(1.2345), Integer(9876.into()), Eof]
+        vec![Float(1.2345), Integer(9876), Eof]
     );
 }
 
@@ -91,7 +91,7 @@ fn operators_no_space() {
 fn excess_spaces() {
     assert_eq!(
         v("   3 +5  "),
-        vec![Integer(3.into()), Plus, Integer(5.into()), Eof],
+        vec![Integer(3), Plus, Integer(5), Eof],
     );
 }
 
@@ -119,16 +119,16 @@ fn span() {
 #[test]
 fn peek() {
     let mut l = lex("1 2 3 4 5", None);
-    assert_eq!(l.peek(), Ok(&(Integer(1.into()), sp(1, 1))));
-    assert_eq!(l.peek(), Ok(&(Integer(1.into()), sp(1, 1))));
-    assert_eq!(l.next(), Ok((Integer(1.into()), sp(1, 1))));
-    assert_eq!(l.next(), Ok((Integer(2.into()), sp(3, 3))));
-    assert_eq!(l.peek(), Ok(&(Integer(3.into()), sp(5, 5))));
-    assert_eq!(l.peek(), Ok(&(Integer(3.into()), sp(5, 5))));
-    assert_eq!(l.next(), Ok((Integer(3.into()), sp(5, 5))));
-    assert_eq!(l.peek(), Ok(&(Integer(4.into()), sp(7, 7))));
-    assert_eq!(l.next(), Ok((Integer(4.into()), sp(7, 7))));
-    assert_eq!(l.next(), Ok((Integer(5.into()), sp(9, 9))));
+    assert_eq!(l.peek(), Ok(&(Integer(1), sp(1, 1))));
+    assert_eq!(l.peek(), Ok(&(Integer(1), sp(1, 1))));
+    assert_eq!(l.next(), Ok((Integer(1), sp(1, 1))));
+    assert_eq!(l.next(), Ok((Integer(2), sp(3, 3))));
+    assert_eq!(l.peek(), Ok(&(Integer(3), sp(5, 5))));
+    assert_eq!(l.peek(), Ok(&(Integer(3), sp(5, 5))));
+    assert_eq!(l.next(), Ok((Integer(3), sp(5, 5))));
+    assert_eq!(l.peek(), Ok(&(Integer(4), sp(7, 7))));
+    assert_eq!(l.next(), Ok((Integer(4), sp(7, 7))));
+    assert_eq!(l.next(), Ok((Integer(5), sp(9, 9))));
     assert_eq!(l.peek(), Ok(&(Eof, sp(10, 10))));
     assert_eq!(l.peek(), Ok(&(Eof, sp(10, 10))));
     assert_eq!(l.next(), Ok((Eof, sp(10, 10))));
