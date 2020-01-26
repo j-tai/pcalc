@@ -1,4 +1,5 @@
 use std::f64::consts;
+use std::i64;
 
 use crate::Expression::*;
 use crate::{eval, Constant, Context, Span};
@@ -135,10 +136,7 @@ fn log() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
-    let x = (
-        Log(Box::new([(8.into(), sp()), (2.into(), sp())])),
-        sp(),
-    );
+    let x = (Log(Box::new([(8.into(), sp()), (2.into(), sp())])), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
 }
 
@@ -179,7 +177,6 @@ fn r#let() {
 
 #[test]
 fn comma() {
-    let mut ctx = ctx();
     let x = (
         Comma(vec![
             (1.0.into(), sp()),
@@ -188,5 +185,27 @@ fn comma() {
         ]),
         sp(),
     );
-    assert_eq!(eval(&x, &mut ctx), Ok(3.0.into()));
+    assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
+}
+
+#[test]
+fn int_overflow() {
+    // i64::MAX + 1 => float
+    let x = (Add(vec![(i64::MAX.into(), sp()), (1.into(), sp())]), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((i64::MAX as f64 + 1.0).into()));
+    // i64::MIN - 1 => float
+    let x = (Sub(Box::new([(i64::MIN.into(), sp()), (1.into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((i64::MIN as f64 - 1.0).into()));
+    // i64::MAX * 2 => float
+    let x = (Mul(vec![(i64::MAX.into(), sp()), (2.into(), sp())]), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((i64::MAX as f64 * 2.0).into()));
+    // i64::MAX / (1/2) => float
+    let x = (Frac(Box::new([(i64::MAX.into(), sp()), ((1, 2).into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((i64::MAX as f64 * 2.0).into()));
+    // 2^100 => float
+    let x = (Exp(Box::new([(2.into(), sp()), (100.into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((2.0_f64.powf(100.0)).into()));
+    // (1/100) root 2 => float
+    let x = (Root(Box::new([(2.into(), sp()), ((1, 100).into(), sp())])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Ok((2.0_f64.powf(100.0)).into()));
 }
