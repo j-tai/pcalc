@@ -13,8 +13,8 @@ type ExprSpan = (Expression, Span);
 
 fn neg(expr: &ExprSpan, c: &mut Context) -> Result<Value> {
     match eval(expr, c)? {
-        Float(f) => Ok(Float(-f)),
-        Ratio(r) => Ok(Ratio(-r)),
+        Float(f) => Ok((-f).into()),
+        Ratio(r) => Ok((-r).into()),
     }
 }
 
@@ -27,8 +27,8 @@ where
     let mut acc = eval(&exprs[0], c)?;
     for expr in &exprs[1..] {
         acc = match (acc, eval(expr, c)?) {
-            (Ratio(lhs), Ratio(rhs)) => Ratio(g(lhs, rhs)),
-            (lhs, rhs) => Float(f(lhs.to_f64(), rhs.to_f64())),
+            (Ratio(lhs), Ratio(rhs)) => g(lhs, rhs).into(),
+            (lhs, rhs) => f(lhs.to_f64(), rhs.to_f64()).into(),
         };
     }
     Ok(acc)
@@ -43,8 +43,8 @@ fn eval_exp(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context) -> Result<Value> {
 fn eval_root(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context) -> Result<Value> {
     let lhs = eval(&lhs, c)?;
     let rhs = match eval(&rhs, c)? {
-        Float(f) => Float(f.recip()),
-        Ratio(r) => Ratio(r.recip()),
+        Float(f) => f.recip().into(),
+        Ratio(r) => r.recip().into(),
     };
     do_exp(lhs, rhs)
 }
@@ -52,9 +52,9 @@ fn eval_root(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context) -> Result<Value> {
 fn do_exp(lhs: Value, rhs: Value) -> Result<Value> {
     match (lhs, rhs) {
         (Ratio(lhs), Ratio(rhs)) if rhs.is_integer() && *rhs.numer() < i32::MAX.into() => {
-            Ok(Ratio(lhs.pow(*rhs.numer() as i32)))
+            Ok(lhs.pow(*rhs.numer() as i32).into())
         }
-        (lhs, rhs) => Ok(Float(lhs.to_f64().powf(rhs.to_f64()))),
+        (lhs, rhs) => Ok(lhs.to_f64().powf(rhs.to_f64()).into()),
     }
 }
 
@@ -70,9 +70,10 @@ pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<Value>
         Frac(args) => apply(|a, b| a / b, |a, b| a / b, &args[..], c),
         Exp(args) => eval_exp(&args[0], &args[1], c),
         Root(args) => eval_root(&args[0], &args[1], c),
-        Log(args) => Ok(Float(
-            eval(&args[0], c)?.to_f64().log(eval(&args[1], c)?.to_f64()),
-        )),
+        Log(args) => Ok(eval(&args[0], c)?
+            .to_f64()
+            .log(eval(&args[1], c)?.to_f64())
+            .into()),
         Const(con) => Ok(con.value()),
         Func(f, expr) => f.apply(eval(expr, c)?, c).map_err(|e| (e, span.clone())),
         Var(var) => {
