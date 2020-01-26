@@ -2,8 +2,8 @@ use std::convert::TryFrom;
 
 use if_chain::if_chain;
 use num::pow::checked_pow;
-use num::traits::{CheckedAdd, CheckedSub, CheckedMul, CheckedDiv};
 use num::rational::Ratio;
+use num::traits::{CheckedAdd, CheckedDiv, CheckedMul, CheckedSub};
 
 use crate::Value::*;
 use crate::{Context, Error, Expression, Result, Span, Value};
@@ -30,12 +30,10 @@ where
     for expr in &exprs[1..] {
         let rhs = eval(expr, c)?;
         acc = match (&acc, &rhs) {
-            (Ratio(a), Ratio(b)) => {
-                match g(*a, *b) {
-                    Some(x) => x.into(),
-                    None => f(acc.to_f64(), rhs.to_f64()).into()
-                }
-            }
+            (Ratio(a), Ratio(b)) => match g(*a, *b) {
+                Some(x) => x.into(),
+                None => f(acc.to_f64(), rhs.to_f64()).into(),
+            },
             (lhs, rhs) => f(lhs.to_f64(), rhs.to_f64()).into(),
         };
     }
