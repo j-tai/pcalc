@@ -34,13 +34,13 @@ fn run_expr(expr: &str, ctx: &mut Context, line: u32) {
             return;
         }
     };
-    ctx.vars.insert(format!("ans{}", line), val);
+    ctx.vars.insert(format!("ans{}", line), val.clone());
+    println!("  ans{:<4} = {}", line, ctx.display(&val));
     if let Some(v) = ctx.vars.get_mut("ans") {
         *v = val;
     } else {
         ctx.vars.insert("ans".to_string(), val);
     }
-    println!("  ans{:<4} = {}", line, ctx.display(val));
 }
 
 fn main() {

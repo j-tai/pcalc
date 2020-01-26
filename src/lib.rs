@@ -7,6 +7,7 @@ pub use crate::lexer::*;
 pub use crate::parser::*;
 pub use crate::span::*;
 pub use crate::token::*;
+pub use crate::value::*;
 
 mod builtin;
 mod context;
@@ -17,3 +18,4 @@ mod lexer;
 mod parser;
 mod span;
 mod token;
+mod value;

@@ -7,18 +7,20 @@ use std::fmt::{Display, Formatter};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+use crate::Value;
+
 /// Execution context, options, and variables.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Context {
     pub angle: AngleMeasure,
     pub notation_range: (f64, f64),
-    pub vars: HashMap<String, f64>,
+    pub vars: HashMap<String, Value>,
 }
 
 impl Context {
     /// Format a number for displaying purposes.
-    pub fn display<'a>(&'a self, num: f64) -> impl Display + 'a {
+    pub fn display<'a>(&'a self, num: &'a Value) -> impl Display + 'a {
         Format { ctx: self, num }
     }
 }
@@ -69,21 +71,22 @@ impl Default for AngleMeasure {
 
 struct Format<'a> {
     ctx: &'a Context,
-    num: f64,
+    num: &'a Value,
 }
 
 impl Display for Format<'_> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        let mag = self.num.abs();
+        let Value::Float(num) = self.num;
+        let mag = num.abs();
         if self.ctx.notation_range.0 < mag && mag < self.ctx.notation_range.1 || mag == 0.0 {
             // Show number normally (no scientific notation) if within the range
             // or equal to zero
-            write!(f, "{}", self.num)
+            write!(f, "{}", num)
         } else if mag < 1.0 {
-            write!(f, "{:e}", self.num)
+            write!(f, "{:e}", num)
         } else {
             // Force '+' on exponent
-            let s = format!("{:e}", self.num);
+            let s = format!("{:e}", num);
             if let Some(e) = s.find('e') {
                 write!(f, "{}e+{}", &s[..e], &s[(e + 1)..])
             } else {

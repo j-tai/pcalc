@@ -5,7 +5,7 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use crate::{Context, Error};
+use crate::{Context, Error, Value};
 
 #[cfg(test)]
 mod tests;
@@ -22,10 +22,10 @@ pub enum Constant {
 
 impl Constant {
     /// Get the value of the constant.
-    pub fn value(self) -> f64 {
+    pub fn value(self) -> Value {
         match self {
-            Constant::Pi => consts::PI,
-            Constant::E => consts::E,
+            Constant::Pi => Value::Float(consts::PI),
+            Constant::E => Value::Float(consts::E),
         }
     }
 }
@@ -88,21 +88,23 @@ impl Function {
     ///
     /// The context is primarily used to determine the angle with which the
     /// calculation should be performed (i.e., degrees or radians).
-    pub fn apply(self, x: f64, ctx: &Context) -> Result<f64, Error> {
+    pub fn apply(self, x: Value, ctx: &Context) -> Result<Value, Error> {
+        use Value::Float;
+        let Float(x) = x;
         match self {
-            Function::Abs => Ok(x.abs()),
-            Function::Sin => Ok(ctx.angle.to_rad(x).sin()),
-            Function::Cos => Ok(ctx.angle.to_rad(x).cos()),
-            Function::Tan => Ok(ctx.angle.to_rad(x).tan()),
-            Function::Asin => Ok(ctx.angle.from_rad(x.asin())),
-            Function::Acos => Ok(ctx.angle.from_rad(x.acos())),
-            Function::Atan => Ok(ctx.angle.from_rad(x.atan())),
-            Function::Sinh => Ok(x.sinh()),
-            Function::Cosh => Ok(x.cosh()),
-            Function::Tanh => Ok(x.tanh()),
-            Function::Asinh => Ok(x.asinh()),
-            Function::Acosh => Ok(x.acosh()),
-            Function::Atanh => Ok(x.atanh()),
+            Function::Abs => Ok(Float(x.abs())),
+            Function::Sin => Ok(Float(ctx.angle.to_rad(x).sin())),
+            Function::Cos => Ok(Float(ctx.angle.to_rad(x).cos())),
+            Function::Tan => Ok(Float(ctx.angle.to_rad(x).tan())),
+            Function::Asin => Ok(Float(ctx.angle.from_rad(x.asin()))),
+            Function::Acos => Ok(Float(ctx.angle.from_rad(x.acos()))),
+            Function::Atan => Ok(Float(ctx.angle.from_rad(x.atan()))),
+            Function::Sinh => Ok(Float(x.sinh())),
+            Function::Cosh => Ok(Float(x.cosh())),
+            Function::Tanh => Ok(Float(x.tanh())),
+            Function::Asinh => Ok(Float(x.asinh())),
+            Function::Acosh => Ok(Float(x.acosh())),
+            Function::Atanh => Ok(Float(x.atanh())),
         }
     }
 }
