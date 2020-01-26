@@ -478,3 +478,18 @@ fn func_neg() {
         )),
     );
 }
+
+#[test]
+fn neg_exp() {
+    let tokens = vec![Minus, 1.into(), Exponent, 2.into(), Eof];
+    assert_eq!(
+        parse(tok(tokens)),
+        Ok((
+            Neg(Box::new((
+                Exp(Box::new([(1.into(), sp()), (2.into(), sp())])),
+                sp(),
+            ))),
+            sp(),
+        ))
+    )
+}
