@@ -15,7 +15,7 @@ fn show_err(err: Error, span: Span) {
     eprintln!("{}: {}", span, err);
 }
 
-fn run_expr(expr: &str, ctx: &mut Context) {
+fn run_expr(expr: &str, ctx: &mut Context, line: u32) {
     if expr.is_empty() {
         return;
     }
@@ -34,17 +34,25 @@ fn run_expr(expr: &str, ctx: &mut Context) {
             return;
         }
     };
-    println!("  = {}", ctx.display(val));
+    ctx.vars.insert(format!("ans{}", line), val);
+    if let Some(v) = ctx.vars.get_mut("ans") {
+        *v = val;
+    } else {
+        ctx.vars.insert("ans".to_string(), val);
+    }
+    println!("  ans{:<4} = {}", line, ctx.display(val));
 }
 
 fn main() {
     let mut context = Context::default();
 
     let mut did_calc = false;
+    let mut line_num = 1;
     for s in env::args().skip(1) {
         println!("{}", s);
-        run_expr(&s, &mut context);
+        run_expr(&s, &mut context, line_num);
         did_calc = true;
+        line_num += 1;
     }
 
     if !did_calc {
@@ -52,7 +60,8 @@ fn main() {
         let stdin = io::stdin();
         for line in BufReader::new(stdin).lines() {
             let line = line.unwrap();
-            run_expr(&line, &mut context);
+            run_expr(&line, &mut context, line_num);
+            line_num += 1;
         }
     }
 }
