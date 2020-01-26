@@ -41,3 +41,21 @@ pub trait TokenStream<'a> {
     fn peek(&mut self) -> Result<&(Token<'a>, Span)>;
     fn next(&mut self) -> Result<(Token<'a>, Span)>;
 }
+
+impl From<u64> for Token<'static> {
+    fn from(num: u64) -> Token<'static> {
+        Token::Integer(num)
+    }
+}
+
+impl From<f64> for Token<'static> {
+    fn from(num: f64) -> Token<'static> {
+        Token::Float(num)
+    }
+}
+
+impl<'a> From<&'a str> for Token<'a> {
+    fn from(num: &'a str) -> Token<'a> {
+        Token::Ident(num)
+    }
+}
