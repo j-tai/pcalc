@@ -194,18 +194,27 @@ fn int_overflow() {
     let x = (Add(vec![(i64::MAX.into(), sp()), (1.into(), sp())]), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok((i64::MAX as f64 + 1.0).into()));
     // i64::MIN - 1 => float
-    let x = (Sub(Box::new([(i64::MIN.into(), sp()), (1.into(), sp())])), sp());
+    let x = (
+        Sub(Box::new([(i64::MIN.into(), sp()), (1.into(), sp())])),
+        sp(),
+    );
     assert_eq!(eval(&x, &mut ctx()), Ok((i64::MIN as f64 - 1.0).into()));
     // i64::MAX * 2 => float
     let x = (Mul(vec![(i64::MAX.into(), sp()), (2.into(), sp())]), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok((i64::MAX as f64 * 2.0).into()));
     // i64::MAX / (1/2) => float
-    let x = (Frac(Box::new([(i64::MAX.into(), sp()), ((1, 2).into(), sp())])), sp());
+    let x = (
+        Frac(Box::new([(i64::MAX.into(), sp()), ((1, 2).into(), sp())])),
+        sp(),
+    );
     assert_eq!(eval(&x, &mut ctx()), Ok((i64::MAX as f64 * 2.0).into()));
     // 2^100 => float
     let x = (Exp(Box::new([(2.into(), sp()), (100.into(), sp())])), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok((2.0_f64.powf(100.0)).into()));
     // (1/100) root 2 => float
-    let x = (Root(Box::new([(2.into(), sp()), ((1, 100).into(), sp())])), sp());
+    let x = (
+        Root(Box::new([(2.into(), sp()), ((1, 100).into(), sp())])),
+        sp(),
+    );
     assert_eq!(eval(&x, &mut ctx()), Ok((2.0_f64.powf(100.0)).into()));
 }
