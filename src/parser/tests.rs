@@ -31,11 +31,11 @@ where
     T: Iterator<Item = (Token<'a>, Span)>,
 {
     fn peek(&mut self) -> Result<&(Token<'a>, Span)> {
-        Ok(self.0.peek().unwrap())
+        Ok(self.0.peek().expect("No more tokens; did you forget Token::Eof?"))
     }
 
     fn next(&mut self) -> Result<(Token<'a>, Span)> {
-        Ok(self.0.next().unwrap())
+        Ok(self.0.next().expect("No more tokens; did you forget Token::Eof?"))
     }
 }
 
