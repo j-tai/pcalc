@@ -1,6 +1,8 @@
-use std::i32;
+use std::convert::TryFrom;
 
-use num::pow::Pow;
+use if_chain::if_chain;
+use num::pow::checked_pow;
+use num::traits::{CheckedAdd, CheckedSub, CheckedMul, CheckedDiv};
 use num::rational::Ratio;
 
 use crate::Value::*;
@@ -21,13 +23,19 @@ fn neg(expr: &ExprSpan, c: &mut Context) -> Result<Value> {
 fn apply<F, G>(mut f: F, mut g: G, exprs: &[ExprSpan], c: &mut Context) -> Result<Value>
 where
     F: FnMut(f64, f64) -> f64,
-    G: FnMut(Ratio<i64>, Ratio<i64>) -> Ratio<i64>,
+    G: FnMut(Ratio<i64>, Ratio<i64>) -> Option<Ratio<i64>>,
 {
     debug_assert!(!exprs.is_empty());
     let mut acc = eval(&exprs[0], c)?;
     for expr in &exprs[1..] {
-        acc = match (acc, eval(expr, c)?) {
-            (Ratio(lhs), Ratio(rhs)) => g(lhs, rhs).into(),
+        let rhs = eval(expr, c)?;
+        acc = match (&acc, &rhs) {
+            (Ratio(a), Ratio(b)) => {
+                match g(*a, *b) {
+                    Some(x) => x.into(),
+                    None => f(acc.to_f64(), rhs.to_f64()).into()
+                }
+            }
             (lhs, rhs) => f(lhs.to_f64(), rhs.to_f64()).into(),
         };
     }
@@ -50,12 +58,17 @@ fn eval_root(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context) -> Result<Value> {
 }
 
 fn do_exp(lhs: Value, rhs: Value) -> Result<Value> {
-    match (lhs, rhs) {
-        (Ratio(lhs), Ratio(rhs)) if rhs.is_integer() && *rhs.numer() < i32::MAX.into() => {
-            Ok(lhs.pow(*rhs.numer() as i32).into())
+    if_chain! {
+        if let Ratio(lhs) = lhs;
+        if let Ratio(rhs) = rhs;
+        if rhs.is_integer();
+        if let Ok(rhs) = usize::try_from(*rhs.numer());
+        if let Some(rhs) = checked_pow(lhs, rhs);
+        then {
+            return Ok(rhs.into());
         }
-        (lhs, rhs) => Ok(lhs.to_f64().powf(rhs.to_f64()).into()),
     }
+    Ok(lhs.to_f64().powf(rhs.to_f64()).into())
 }
 
 /// Evaluate the expression in the given context.
@@ -64,10 +77,10 @@ pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<Value>
     match expr {
         Val(v) => Ok(v.clone()),
         Neg(expr) => neg(expr, c),
-        Add(exprs) => apply(|a, b| a + b, |a, b| a + b, exprs, c),
-        Sub(args) => apply(|a, b| a - b, |a, b| a - b, &args[..], c),
-        Mul(exprs) => apply(|a, b| a * b, |a, b| a * b, exprs, c),
-        Frac(args) => apply(|a, b| a / b, |a, b| a / b, &args[..], c),
+        Add(exprs) => apply(|a, b| a + b, |a, b| a.checked_add(&b), exprs, c),
+        Sub(args) => apply(|a, b| a - b, |a, b| a.checked_sub(&b), &args[..], c),
+        Mul(exprs) => apply(|a, b| a * b, |a, b| a.checked_mul(&b), exprs, c),
+        Frac(args) => apply(|a, b| a / b, |a, b| a.checked_div(&b), &args[..], c),
         Exp(args) => eval_exp(&args[0], &args[1], c),
         Root(args) => eval_root(&args[0], &args[1], c),
         Log(args) => Ok(eval(&args[0], c)?
