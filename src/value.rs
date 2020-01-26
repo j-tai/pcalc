@@ -34,6 +34,12 @@ impl From<Ratio<i64>> for Value {
     }
 }
 
+impl From<(i64, i64)> for Value {
+    fn from(val: (i64, i64)) -> Value {
+        Value::Ratio(val.into())
+    }
+}
+
 impl From<f64> for Value {
     fn from(val: f64) -> Value {
         Value::Float(val.into())
