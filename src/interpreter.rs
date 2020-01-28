@@ -30,7 +30,7 @@ where
     for expr in &exprs[1..] {
         let rhs = eval(expr, c)?;
         acc = match (&acc, &rhs) {
-            (Ratio(a), Ratio(b)) => match g(*a, *b) {
+            (Ratio(left), Ratio(right)) => match g(*left, *right) {
                 Some(x) => x.into(),
                 None => f(acc.to_f64(), rhs.to_f64()).into(),
             },

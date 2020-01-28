@@ -53,6 +53,7 @@ impl AngleMeasure {
     }
 
     /// Convert the angle from radians to `self`'s angle measure.
+    #[allow(clippy::wrong_self_convention)]
     pub fn from_rad(self, value: f64) -> f64 {
         match self {
             AngleMeasure::Degrees => value.to_degrees(),

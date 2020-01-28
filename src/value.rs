@@ -42,6 +42,6 @@ impl From<(i64, i64)> for Value {
 
 impl From<f64> for Value {
     fn from(val: f64) -> Value {
-        Value::Float(val.into())
+        Value::Float(val)
     }
 }

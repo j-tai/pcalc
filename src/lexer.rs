@@ -83,16 +83,16 @@ impl<'a> Lex<'a> {
         let mut end = 0;
         let mut is_float = false;
         end = self.read_while(end, |c| c.is_digit(10));
-        if self.input[end..].chars().next() == Some('.') {
-            end = end + 1;
+        if self.input[end..].starts_with('.') {
+            end += 1;
             end = self.read_while(end, |c| c.is_digit(10));
             is_float = true;
         }
         if let Some('e') | Some('E') = self.input[end..].chars().next() {
-            end = end + 1;
+            end += 1;
             // Consume a + or -
             if let Some('+') | Some('-') = self.input[end..].chars().next() {
-                end = end + 1;
+                end += 1;
             }
             // Consume exponent
             end = self.read_while(end, |c| c.is_digit(10));
