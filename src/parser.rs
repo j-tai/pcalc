@@ -154,7 +154,7 @@ pub fn parse<'a>(mut it: impl TokenStream<'a>) -> Result<(Expression, Span)> {
     let expr = parse_0(&mut it)?;
     let (tok, span) = it.next()?;
     if tok != Token::Eof {
-        Err((Error::Syntax, span.clone()))
+        Err((Error::Syntax, span))
     } else {
         Ok(expr)
     }
