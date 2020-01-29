@@ -20,8 +20,6 @@ pub enum Expression {
     Exp(Box<[(Expression, Span); 2]>),
     /// A radical with a radicand expression and an index expression.
     Root(Box<[(Expression, Span); 2]>),
-    /// A logarithm with an expression and a base expression.
-    Log(Box<[(Expression, Span); 2]>),
 
     /// A mathematical constant.
     Const(Constant),
