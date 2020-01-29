@@ -125,22 +125,6 @@ fn root() {
 }
 
 #[test]
-fn log() {
-    let x = (
-        Log(Box::new([(9.0.into(), sp()), (3.0.into(), sp())])),
-        sp(),
-    );
-    assert_eq!(eval(&x, &mut ctx()), Ok(2.0.into()));
-    let x = (
-        Log(Box::new([(8.0.into(), sp()), (2.0.into(), sp())])),
-        sp(),
-    );
-    assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
-    let x = (Log(Box::new([(8.into(), sp()), (2.into(), sp())])), sp());
-    assert_eq!(eval(&x, &mut ctx()), Ok(3.0.into()));
-}
-
-#[test]
 fn const_pi() {
     let x = (Const(Constant::Pi), sp());
     assert_eq!(eval(&x, &mut ctx()), Ok(consts::PI.into()));

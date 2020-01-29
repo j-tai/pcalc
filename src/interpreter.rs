@@ -81,10 +81,6 @@ pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<Value>
         Frac(args) => apply(|a, b| a / b, |a, b| a.checked_div(&b), &args[..], c),
         Exp(args) => eval_exp(&args[0], &args[1], c),
         Root(args) => eval_root(&args[0], &args[1], c),
-        Log(args) => Ok(eval(&args[0], c)?
-            .to_f64()
-            .log(eval(&args[1], c)?.to_f64())
-            .into()),
         Const(con) => Ok(con.value()),
         Func(f, expr) => f.apply(eval(expr, c)?, c).map_err(|e| (e, span.clone())),
         Var(var) => {
