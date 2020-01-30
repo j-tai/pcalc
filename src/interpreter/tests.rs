@@ -2,7 +2,7 @@ use std::f64::consts;
 use std::i64;
 
 use crate::Expression::*;
-use crate::{eval, Constant, Context, Span};
+use crate::{eval, Constant, Context, Error, Span, Value};
 
 fn sp() -> Span {
     Span {
@@ -201,4 +201,22 @@ fn int_overflow() {
         sp(),
     );
     assert_eq!(eval(&x, &mut ctx()), Ok((2.0_f64.powf(100.0)).into()));
+}
+
+#[test]
+fn invalid_types() {
+    let func = || (Value::Func(vec![], Box::new((0.into(), sp()))).into(), sp());
+    let zero = || (0.into(), sp());
+    let x = (Add(vec![func(), zero()]), sp());
+    assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
+    let x = (Sub(Box::new([zero(), func()])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
+    let x = (Mul(vec![zero(), func()]), sp());
+    assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
+    let x = (Frac(Box::new([func(), zero()])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
+    let x = (Exp(Box::new([func(), zero()])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
+    let x = (Root(Box::new([zero(), func()])), sp());
+    assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
 }

@@ -7,7 +7,7 @@ use std::str::FromStr;
 
 use num::traits::Signed;
 
-use crate::{Context, Error, Value,Span};
+use crate::{Context, Error, Span, Value};
 
 #[cfg(test)]
 mod tests;
@@ -96,7 +96,7 @@ impl Function {
             match x {
                 Value::Float(f) => Ok(f.abs().into()),
                 Value::Ratio(f) => Ok(f.abs().into()),
-                _ => Err((Error::Type, span.clone()))
+                _ => Err((Error::Type, span.clone())),
             }
         } else {
             let x = match x {
