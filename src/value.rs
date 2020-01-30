@@ -13,7 +13,7 @@ pub enum Value {
     /// A floating-point number.
     Float(f64),
     /// A function.
-    Func(Vec<String>, Box<(Expression, Span)>)
+    Func(Vec<String>, Box<(Expression, Span)>),
 }
 
 impl From<i64> for Value {
