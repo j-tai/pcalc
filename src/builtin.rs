@@ -7,7 +7,7 @@ use std::str::FromStr;
 
 use num::traits::Signed;
 
-use crate::{Context, Error, Value};
+use crate::{Context, Error, Value,Span};
 
 #[cfg(test)]
 mod tests;
@@ -91,24 +91,34 @@ impl Function {
     ///
     /// The context is primarily used to determine the angle with which the
     /// calculation should be performed (i.e., degrees or radians).
-    pub fn apply(self, x: Value, ctx: &Context) -> Result<Value, Error> {
-        match self {
-            Function::Abs => match x {
+    pub fn apply(self, x: Value, ctx: &Context, span: &Span) -> crate::Result<Value> {
+        if self == Function::Abs {
+            match x {
                 Value::Float(f) => Ok(f.abs().into()),
                 Value::Ratio(f) => Ok(f.abs().into()),
-            },
-            Function::Sin => Ok(ctx.angle.to_rad(x.to_f64()).sin().into()),
-            Function::Cos => Ok(ctx.angle.to_rad(x.to_f64()).cos().into()),
-            Function::Tan => Ok(ctx.angle.to_rad(x.to_f64()).tan().into()),
-            Function::Asin => Ok(ctx.angle.from_rad(x.to_f64().asin()).into()),
-            Function::Acos => Ok(ctx.angle.from_rad(x.to_f64().acos()).into()),
-            Function::Atan => Ok(ctx.angle.from_rad(x.to_f64().atan()).into()),
-            Function::Sinh => Ok(x.to_f64().sinh().into()),
-            Function::Cosh => Ok(x.to_f64().cosh().into()),
-            Function::Tanh => Ok(x.to_f64().tanh().into()),
-            Function::Asinh => Ok(x.to_f64().asinh().into()),
-            Function::Acosh => Ok(x.to_f64().acosh().into()),
-            Function::Atanh => Ok(x.to_f64().atanh().into()),
+                _ => Err((Error::Type, span.clone()))
+            }
+        } else {
+            let x = match x {
+                Value::Float(f) => f,
+                Value::Ratio(f) => *f.numer() as f64 / *f.denom() as f64,
+                _ => return Err((Error::Type, span.clone())),
+            };
+            match self {
+                Function::Abs => unreachable!(),
+                Function::Sin => Ok(ctx.angle.to_rad(x).sin().into()),
+                Function::Cos => Ok(ctx.angle.to_rad(x).cos().into()),
+                Function::Tan => Ok(ctx.angle.to_rad(x).tan().into()),
+                Function::Asin => Ok(ctx.angle.from_rad(x.asin()).into()),
+                Function::Acos => Ok(ctx.angle.from_rad(x.acos()).into()),
+                Function::Atan => Ok(ctx.angle.from_rad(x.atan()).into()),
+                Function::Sinh => Ok(x.sinh().into()),
+                Function::Cosh => Ok(x.cosh().into()),
+                Function::Tanh => Ok(x.tanh().into()),
+                Function::Asinh => Ok(x.asinh().into()),
+                Function::Acosh => Ok(x.acosh().into()),
+                Function::Atanh => Ok(x.atanh().into()),
+            }
         }
     }
 }

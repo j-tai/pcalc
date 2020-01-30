@@ -105,6 +105,7 @@ impl Display for Format<'_> {
                     }
                 }
             }
+            Value::Func(_, _) => write!(f, "<function>"),
         }
     }
 }

@@ -13,14 +13,30 @@ mod tests;
 
 type ExprSpan = (Expression, Span);
 
-fn neg(expr: &ExprSpan, c: &mut Context) -> Result<Value> {
+fn neg(expr: &ExprSpan, c: &mut Context, span: &Span) -> Result<Value> {
     match eval(expr, c)? {
         Float(f) => Ok((-f).into()),
         Ratio(r) => Ok((-r).into()),
+        _ => Err((Error::Type, span.clone())),
     }
 }
 
-fn apply<F, G>(mut f: F, mut g: G, exprs: &[ExprSpan], c: &mut Context) -> Result<Value>
+/// Converts the value to a float.
+fn to_f64(val: &Value, span: &Span) -> Result<f64> {
+    match val {
+        Value::Ratio(f) => Ok(*f.numer() as f64 / *f.denom() as f64),
+        Value::Float(f) => Ok(*f),
+        _ => Err((Error::Type, span.clone())),
+    }
+}
+
+fn apply<F, G>(
+    mut f: F,
+    mut g: G,
+    exprs: &[ExprSpan],
+    c: &mut Context,
+    span: &Span,
+) -> Result<Value>
 where
     F: FnMut(f64, f64) -> f64,
     G: FnMut(Ratio<i64>, Ratio<i64>) -> Option<Ratio<i64>>,
@@ -32,30 +48,31 @@ where
         acc = match (&acc, &rhs) {
             (Ratio(left), Ratio(right)) => match g(*left, *right) {
                 Some(x) => x.into(),
-                None => f(acc.to_f64(), rhs.to_f64()).into(),
+                None => f(to_f64(&acc, span)?, to_f64(&rhs, span)?).into(),
             },
-            (lhs, rhs) => f(lhs.to_f64(), rhs.to_f64()).into(),
+            (lhs, rhs) => f(to_f64(&lhs, span)?, to_f64(&rhs, span)?).into(),
         };
     }
     Ok(acc)
 }
 
-fn eval_exp(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context) -> Result<Value> {
+fn eval_exp(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context, span: &Span) -> Result<Value> {
     let lhs = eval(&lhs, c)?;
     let rhs = eval(&rhs, c)?;
-    do_exp(lhs, rhs)
+    do_exp(lhs, rhs, span)
 }
 
-fn eval_root(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context) -> Result<Value> {
+fn eval_root(lhs: &ExprSpan, rhs: &ExprSpan, c: &mut Context, span: &Span) -> Result<Value> {
     let lhs = eval(&lhs, c)?;
     let rhs = match eval(&rhs, c)? {
         Float(f) => f.recip().into(),
         Ratio(r) => r.recip().into(),
+        _ => return Err((Error::Type, span.clone())),
     };
-    do_exp(lhs, rhs)
+    do_exp(lhs, rhs, span)
 }
 
-fn do_exp(lhs: Value, rhs: Value) -> Result<Value> {
+fn do_exp(lhs: Value, rhs: Value, span: &Span) -> Result<Value> {
     if_chain! {
         if let Ratio(lhs) = lhs;
         if let Ratio(rhs) = rhs;
@@ -66,7 +83,7 @@ fn do_exp(lhs: Value, rhs: Value) -> Result<Value> {
             return Ok(rhs.into());
         }
     }
-    Ok(lhs.to_f64().powf(rhs.to_f64()).into())
+    Ok(to_f64(&lhs, span)?.powf(to_f64(&rhs, span)?).into())
 }
 
 /// Evaluate the expression in the given context.
@@ -74,15 +91,15 @@ pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<Value>
     use crate::Expression::*;
     match expr {
         Val(v) => Ok(v.clone()),
-        Neg(expr) => neg(expr, c),
-        Add(exprs) => apply(|a, b| a + b, |a, b| a.checked_add(&b), exprs, c),
-        Sub(args) => apply(|a, b| a - b, |a, b| a.checked_sub(&b), &args[..], c),
-        Mul(exprs) => apply(|a, b| a * b, |a, b| a.checked_mul(&b), exprs, c),
-        Frac(args) => apply(|a, b| a / b, |a, b| a.checked_div(&b), &args[..], c),
-        Exp(args) => eval_exp(&args[0], &args[1], c),
-        Root(args) => eval_root(&args[0], &args[1], c),
+        Neg(expr) => neg(expr, c, span),
+        Add(exprs) => apply(|a, b| a + b, |a, b| a.checked_add(&b), exprs, c, span),
+        Sub(args) => apply(|a, b| a - b, |a, b| a.checked_sub(&b), &args[..], c, span),
+        Mul(exprs) => apply(|a, b| a * b, |a, b| a.checked_mul(&b), exprs, c, span),
+        Frac(args) => apply(|a, b| a / b, |a, b| a.checked_div(&b), &args[..], c, span),
+        Exp(args) => eval_exp(&args[0], &args[1], c, span),
+        Root(args) => eval_root(&args[0], &args[1], c, span),
         Const(con) => Ok(con.value()),
-        Func(f, expr) => f.apply(eval(expr, c)?, c).map_err(|e| (e, span.clone())),
+        Func(f, expr) => f.apply(eval(expr, c)?, c, span),
         Var(var) => {
             if let Some(val) = c.vars.get(var.as_str()) {
                 Ok(val.clone())
