@@ -13,6 +13,8 @@ pub enum Error {
     Syntax,
     /// Tried to access an undefined variable.
     Undefined(String),
+    /// Invalid argument type.
+    Type,
 }
 
 impl Display for Error {
@@ -20,6 +22,7 @@ impl Display for Error {
         match self {
             Error::Syntax => write!(f, "Syntax error"),
             Error::Undefined(v) => write!(f, "Undefined variable '{}'", v),
+            Error::Type => write!(f, "Invalid argument type"),
         }
     }
 }
