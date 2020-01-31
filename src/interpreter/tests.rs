@@ -220,3 +220,18 @@ fn invalid_types() {
     let x = (Root(Box::new([zero(), func()])), sp());
     assert_eq!(eval(&x, &mut ctx()), Err((Error::Type, sp())));
 }
+
+#[test]
+fn call() {
+    let func1 = Value::Func(
+        vec!["foo".to_string()],
+        Box::new((
+            Add(vec![(Var("foo".to_string()), sp()), (1.into(), sp())]),
+            sp(),
+        )),
+    );
+    let mut c = ctx();
+    c.vars.insert("increment".to_string(), func1);
+    let x = (Call("increment".to_string(), vec![(4.into(), sp())]), sp());
+    assert_eq!(eval(&x, &mut c), Ok(5.into()));
+}

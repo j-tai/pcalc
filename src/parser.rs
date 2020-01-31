@@ -123,7 +123,8 @@ fn parse_5<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
     }
 }
 
-/// Parse a sixth-level expression: numeric literals and parentheses.
+/// Parse a sixth-level expression: numeric literals, function calls, and
+/// parentheses.
 fn parse_6<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
     let (tok, span) = it.next()?;
     match tok {
@@ -141,6 +142,22 @@ fn parse_6<'a>(it: &mut impl TokenStream<'a>) -> Result<(Expression, Span)> {
         Token::Ident(id) => {
             if let Ok(con) = id.parse() {
                 Ok((Expression::Const(con), span))
+            } else if let (Token::LeftParen, _) = it.peek()? {
+                it.next()?;
+                let mut args = vec![];
+                if it.peek()?.0 == Token::RightParen {
+                    it.next()?;
+                } else {
+                    loop {
+                        args.push(parse_1(it)?);
+                        match it.next()? {
+                            (Token::RightParen, _) => break,
+                            (Token::Comma, _) => (),
+                            (_, span) => return Err((Error::Syntax, span)),
+                        }
+                    }
+                }
+                Ok((Expression::Call(id.to_string(), args), span))
             } else {
                 Ok((Expression::Var(id.to_string()), span))
             }
