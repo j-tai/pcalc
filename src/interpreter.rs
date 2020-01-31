@@ -112,6 +112,25 @@ pub fn eval((expr, span): &(Expression, Span), c: &mut Context) -> Result<Value>
             c.vars.insert(var.clone(), x.clone());
             Ok(x)
         }
+        Call(name, args) => {
+            let args = args
+                .iter()
+                .map(|a| eval(a, c))
+                .collect::<Result<Vec<_>>>()?;
+            let (params, expr) = match c.vars.get(name) {
+                Some(Value::Func(params, expr)) => (params, expr),
+                Some(_) => return Err((Error::Type, span.clone())),
+                None => return Err((Error::Undefined(name.to_string()), span.clone())),
+            };
+            if args.len() != params.len() {
+                return Err((Error::Syntax, span.clone()));
+            }
+            let mut inner_ctx = Context::default();
+            for (name, val) in params.iter().zip(args.into_iter()) {
+                inner_ctx.vars.insert(name.to_string(), val);
+            }
+            eval(expr, &mut inner_ctx)
+        }
         Comma(exprs) => {
             debug_assert!(!exprs.is_empty());
             let len = exprs.len();

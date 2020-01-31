@@ -493,3 +493,33 @@ fn neg_exp() {
         ))
     )
 }
+
+#[test]
+fn call() {
+    let tokens = vec![Ident("foo"), LeftParen, RightParen, Eof];
+    assert_eq!(
+        parse(tok(tokens)),
+        Ok((Call("foo".to_string(), vec![]), sp())),
+    );
+    let tokens = vec![Ident("foo"), LeftParen, 1.into(), RightParen, Eof];
+    assert_eq!(
+        parse(tok(tokens)),
+        Ok((Call("foo".to_string(), vec![(1.into(), sp())]), sp())),
+    );
+    let tokens = vec![
+        Ident("foo"),
+        LeftParen,
+        1.into(),
+        Token::Comma,
+        2.into(),
+        RightParen,
+        Eof,
+    ];
+    assert_eq!(
+        parse(tok(tokens)),
+        Ok((
+            Call("foo".to_string(), vec![(1.into(), sp()), (2.into(), sp())]),
+            sp()
+        )),
+    );
+}

@@ -30,6 +30,8 @@ pub enum Expression {
     Var(String),
     /// An assignment to a variable.
     Let(String, Box<(Expression, Span)>),
+    /// A call to a user-defined function.
+    Call(String, Vec<(Expression, Span)>),
 
     /// Multiple expressions delimited by commas.
     Comma(Vec<(Expression, Span)>),
